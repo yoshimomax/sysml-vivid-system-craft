@@ -58,16 +58,18 @@ const ModelingCanvas = ({
   
   const getDefaultSizeForType = (type: ElementType): Size => {
     switch (type) {
-      case "Block":
+      case "Part":
         return { width: 180, height: 120 };
       case "Requirement":
         return { width: 200, height: 100 };
       case "Package":
         return { width: 220, height: 160 };
-      case "Activity":
+      case "Action":
       case "State":
-      case "UseCase":
         return { width: 160, height: 100 };
+      case "Class":
+      case "Feature":
+        return { width: 180, height: 120 };
       default:
         return { width: 160, height: 80 };
     }

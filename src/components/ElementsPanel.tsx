@@ -68,9 +68,9 @@ const ElementsPanel = ({ onElementDragStart }: ElementsPanelProps) => {
       
       <ElementGroup title="Structure" defaultOpen={true}>
         <ElementItem
-          type="Block"
+          type="Part"
           icon={<Box className="h-6 w-6" />}
-          label="Block"
+          label="Part"
           onDragStart={onElementDragStart}
         />
         <ElementItem
@@ -80,36 +80,30 @@ const ElementsPanel = ({ onElementDragStart }: ElementsPanelProps) => {
           onDragStart={onElementDragStart}
         />
         <ElementItem
-          type="Port"
+          type="PortDefinition"
           icon={<Layout className="h-6 w-6" />}
-          label="Port"
+          label="Port Definition"
           onDragStart={onElementDragStart}
         />
         <ElementItem
-          type="Interface"
+          type="InterfaceDefinition"
           icon={<LayoutGrid className="h-6 w-6" />}
-          label="Interface"
+          label="Interface Definition"
           onDragStart={onElementDragStart}
         />
       </ElementGroup>
       
       <ElementGroup title="Behavior">
         <ElementItem
-          type="Activity"
+          type="Action"
           icon={<Activity className="h-6 w-6" />}
-          label="Activity"
+          label="Action"
           onDragStart={onElementDragStart}
         />
         <ElementItem
           type="State"
           icon={<LayoutGrid className="h-6 w-6" />}
           label="State"
-          onDragStart={onElementDragStart}
-        />
-        <ElementItem
-          type="UseCase"
-          icon={<Layout className="h-6 w-6" />}
-          label="Use Case"
           onDragStart={onElementDragStart}
         />
       </ElementGroup>
@@ -119,6 +113,27 @@ const ElementsPanel = ({ onElementDragStart }: ElementsPanelProps) => {
           type="Requirement"
           icon={<FileBarChart className="h-6 w-6" />}
           label="Requirement"
+          onDragStart={onElementDragStart}
+        />
+      </ElementGroup>
+
+      <ElementGroup title="KerML Core">
+        <ElementItem
+          type="Feature"
+          icon={<Box className="h-6 w-6" />}
+          label="Feature"
+          onDragStart={onElementDragStart}
+        />
+        <ElementItem
+          type="Class"
+          icon={<Layout className="h-6 w-6" />}
+          label="Class"
+          onDragStart={onElementDragStart}
+        />
+        <ElementItem
+          type="Association"
+          icon={<LayoutGrid className="h-6 w-6" />}
+          label="Association"
           onDragStart={onElementDragStart}
         />
       </ElementGroup>

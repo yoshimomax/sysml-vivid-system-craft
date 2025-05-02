@@ -182,9 +182,9 @@ const PropertiesPanel = ({ selectedElement, onElementUpdate }: PropertiesPanelPr
         </div>
       </PropertyGroup>
 
-      {selectedElement.type === "Block" && (
-        <PropertyGroup title="Block Specific">
-          <p className="text-xs text-muted-foreground">Additional block properties will appear here</p>
+      {selectedElement.type === "Part" && (
+        <PropertyGroup title="Part Specific">
+          <p className="text-xs text-muted-foreground">Additional part properties will appear here</p>
         </PropertyGroup>
       )}
 
