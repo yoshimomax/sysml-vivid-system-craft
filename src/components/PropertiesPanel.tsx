@@ -67,6 +67,20 @@ const PropertiesPanel = ({ selectedElement, onElementUpdate }: PropertiesPanelPr
     }
   };
 
+  const handlePropertiesChange = (propertyName: string, value: string) => {
+    if (!selectedElement) return;
+
+    const updatedProperties = {
+      ...selectedElement.properties,
+      [propertyName]: value
+    };
+
+    onElementUpdate({
+      ...selectedElement,
+      properties: updatedProperties
+    });
+  };
+
   if (!selectedElement) {
     return (
       <div className="p-4 text-center text-muted-foreground">
@@ -182,13 +196,7 @@ const PropertiesPanel = ({ selectedElement, onElementUpdate }: PropertiesPanelPr
               <Input
                 id="reqId"
                 value={selectedElement.properties?.reqId || ""}
-                onChange={(e) => {
-                  const updatedProps = {
-                    ...selectedElement.properties,
-                    reqId: e.target.value,
-                  };
-                  handleInputChange("properties", updatedProps);
-                }}
+                onChange={(e) => handlePropertiesChange("reqId", e.target.value)}
               />
             </div>
             <div>
@@ -196,13 +204,7 @@ const PropertiesPanel = ({ selectedElement, onElementUpdate }: PropertiesPanelPr
               <Input
                 id="priority"
                 value={selectedElement.properties?.priority || ""}
-                onChange={(e) => {
-                  const updatedProps = {
-                    ...selectedElement.properties,
-                    priority: e.target.value,
-                  };
-                  handleInputChange("properties", updatedProps);
-                }}
+                onChange={(e) => handlePropertiesChange("priority", e.target.value)}
                 placeholder="High/Medium/Low"
               />
             </div>
