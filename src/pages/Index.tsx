@@ -22,6 +22,7 @@ const Index = () => {
   ]);
   const [activeDiagramId, setActiveDiagramId] = useState<string>(diagrams[0].id);
   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
+  const [selectedRelationship, setSelectedRelationship] = useState<Relationship | null>(null);
   const { toast } = useToast();
 
   const activeDiagram = diagrams.find((d) => d.id === activeDiagramId) || diagrams[0];
@@ -43,6 +44,27 @@ const Index = () => {
     if (selectedElement && selectedElement.id === updatedElement.id) {
       setSelectedElement(updatedElement);
     }
+  };
+
+  const handleRelationshipUpdate = (updatedRelationship: Relationship) => {
+    const updatedRelationships = relationships.map((rel) =>
+      rel.id === updatedRelationship.id ? updatedRelationship : rel
+    );
+
+    updateDiagramRelationships(updatedRelationships);
+    
+    // Also update the selected relationship reference
+    if (selectedRelationship && selectedRelationship.id === updatedRelationship.id) {
+      setSelectedRelationship(updatedRelationship);
+    }
+  };
+
+  const handleRelationshipSelect = (relationshipId: string) => {
+    // Deselect element when selecting a relationship
+    setSelectedElement(null);
+    
+    const relationship = relationships.find(r => r.id === relationshipId);
+    setSelectedRelationship(relationship || null);
   };
 
   const updateDiagramElements = (newElements: Element[]) => {
@@ -85,6 +107,7 @@ const Index = () => {
     setDiagrams([...diagrams, newDiagram]);
     setActiveDiagramId(newDiagram.id);
     setSelectedElement(null);
+    setSelectedRelationship(null);
 
     toast({
       title: "Diagram created",
@@ -110,6 +133,7 @@ const Index = () => {
     if (diagramId === activeDiagramId) {
       setActiveDiagramId(updatedDiagrams[0].id);
       setSelectedElement(null);
+      setSelectedRelationship(null);
     }
 
     toast({
@@ -144,7 +168,10 @@ const Index = () => {
             relationships={relationships}
             setRelationships={updateDiagramRelationships}
             selectedElement={selectedElement}
-            setSelectedElement={setSelectedElement}
+            setSelectedElement={(element) => {
+              setSelectedElement(element);
+              setSelectedRelationship(null); // Deselect relationship when selecting an element
+            }}
           />
         </div>
         
@@ -152,7 +179,9 @@ const Index = () => {
         <div className="w-72 border-l border-border bg-card overflow-y-auto">
           <PropertiesPanel
             selectedElement={selectedElement}
+            selectedRelationship={selectedRelationship}
             onElementUpdate={handleElementUpdate}
+            onRelationshipUpdate={handleRelationshipUpdate}
           />
         </div>
       </div>
