@@ -69,5 +69,4 @@ export interface UIState {
 }
 
 // Combined state type
-export interface ModelingState 
-  extends ProjectState, ElementState, RelationshipState, SelectionState, UIState {}
+export type ModelingState = ProjectState & ElementState & RelationshipState & SelectionState & UIState;

@@ -1,7 +1,7 @@
 
 import { StateCreator } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { ModelingState } from '../types/storeTypes';
+import { ModelingState, RelationshipState } from '../types/storeTypes';
 import { eventBus, DiagramEventsExtended } from '../../core/EventBus';
 
 // Relationship state slice
@@ -9,7 +9,7 @@ export const createRelationshipSlice: StateCreator<
   ModelingState,
   [],
   [],
-  Pick<ModelingState, keyof ModelingState>
+  RelationshipState
 > = (set, get) => ({
   // State
   isCreatingRelationship: false,

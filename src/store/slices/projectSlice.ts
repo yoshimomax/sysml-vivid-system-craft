@@ -1,7 +1,7 @@
 
 import { StateCreator } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { ModelingState } from '../types/storeTypes';
+import { ModelingState, ProjectState } from '../types/storeTypes';
 import { eventBus, DiagramEventsExtended } from '../../core/EventBus';
 
 // Project state slice
@@ -9,7 +9,7 @@ export const createProjectSlice: StateCreator<
   ModelingState,
   [],
   [],
-  Pick<ModelingState, keyof ModelingState>
+  ProjectState
 > = (set, get) => ({
   // Initial state
   project: {

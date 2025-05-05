@@ -9,12 +9,12 @@ import { createUISlice } from './slices/uiSlice';
 import { DiagramEvents } from '../core/EventBus';
 
 // Create the store by combining all slices
-export const useModelingStore = create<ModelingState>((set, get) => ({
-  ...createProjectSlice(set, get),
-  ...createElementSlice(set, get),
-  ...createRelationshipSlice(set, get),
-  ...createSelectionSlice(set, get),
-  ...createUISlice(set, get)
+export const useModelingStore = create<ModelingState>()((...a) => ({
+  ...createProjectSlice(...a),
+  ...createElementSlice(...a),
+  ...createRelationshipSlice(...a),
+  ...createSelectionSlice(...a),
+  ...createUISlice(...a)
 }));
 
 // Initialize the active diagram ID

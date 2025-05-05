@@ -1,13 +1,13 @@
 
 import { StateCreator } from 'zustand';
-import { ModelingState } from '../types/storeTypes';
+import { ModelingState, UIState } from '../types/storeTypes';
 
 // UI state slice
 export const createUISlice: StateCreator<
   ModelingState,
   [],
   [],
-  Pick<ModelingState, keyof ModelingState>
+  UIState
 > = (set) => ({
   // State
   isDragging: false,
