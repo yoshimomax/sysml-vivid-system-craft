@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Diagram, Element, ElementType, Relationship } from "@/types/sysml";
 import { Separator } from "@/components/ui/separator";
@@ -30,6 +30,11 @@ const Index = () => {
   const relationships = activeDiagram.relationships || [];
   
   console.log("Index rendering with elements:", elements);
+
+  useEffect(() => {
+    console.log("Current diagrams state:", diagrams);
+    console.log("Active diagram elements:", elements);
+  }, [diagrams, elements]);
 
   const handleElementDragStart = (type: ElementType) => {
     console.log(`Started dragging a ${type} element`);

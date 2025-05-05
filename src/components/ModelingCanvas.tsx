@@ -1,5 +1,5 @@
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Element, Relationship } from "@/types/sysml";
 import { ElementRenderer } from "./modeling/ElementRenderer";
 import { RelationshipRenderer } from "./modeling/RelationshipRenderer";
@@ -59,6 +59,10 @@ const ModelingCanvas = ({
     setRelationships,
     setSelectedRelationship
   });
+
+  useEffect(() => {
+    console.log("Elements in ModelingCanvas updated:", elementArray);
+  }, [elementArray]);
 
   const handleElementMouseDown = (e: React.MouseEvent, element: Element) => {
     e.stopPropagation();
@@ -124,9 +128,10 @@ const ModelingCanvas = ({
   const handleElementDrop = (newElement: Element) => {
     console.log('Element dropped:', newElement);
     setElements(prev => {
-      // Ensure prev is an array
-      const prevElements = Array.isArray(prev) ? prev : [];
-      return [...prevElements, newElement];
+      const prevArray = Array.isArray(prev) ? prev : [];
+      const newElements = [...prevArray, newElement];
+      console.log('Updated elements array:', newElements);
+      return newElements;
     });
     setSelectedElement(newElement);
   };
@@ -157,12 +162,14 @@ const ModelingCanvas = ({
             onRelationshipClick={handleRelationshipClick}
           />
           
-          <ElementRenderer
-            elements={elementArray}
-            selectedElement={selectedElement}
-            onElementMouseDown={handleElementMouseDown}
-            onElementContextMenu={handleElementContextMenu}
-          />
+          {elementArray.length > 0 && (
+            <ElementRenderer
+              elements={elementArray}
+              selectedElement={selectedElement}
+              onElementMouseDown={handleElementMouseDown}
+              onElementContextMenu={handleElementContextMenu}
+            />
+          )}
         </div>
       </ElementDropHandler>
     </div>

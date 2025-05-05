@@ -35,6 +35,7 @@ export const ElementRenderer = ({
             top: `${element.position.y}px`,
             width: `${element.size.width}px`,
             height: `${element.size.height}px`,
+            zIndex: 10
           }}
           data-element-id={element.id}
           data-type={element.type}

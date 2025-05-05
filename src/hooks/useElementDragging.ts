@@ -21,8 +21,8 @@ export const useElementDragging = ({
     const canvasRect = canvasRef.current?.getBoundingClientRect();
     if (!canvasRect) return;
     
-    const mouseX = e.clientX - canvasRect.left;
-    const mouseY = e.clientY - canvasRect.top;
+    const mouseX = e.clientX - canvasRect.left + (canvasRef.current?.scrollLeft || 0);
+    const mouseY = e.clientY - canvasRect.top + (canvasRef.current?.scrollTop || 0);
     
     setDragOffset({
       x: mouseX - element.position.x,
@@ -36,14 +36,14 @@ export const useElementDragging = ({
     const canvasRect = canvasRef.current?.getBoundingClientRect();
     if (!canvasRect) return;
     
-    const mouseX = e.clientX - canvasRect.left;
-    const mouseY = e.clientY - canvasRect.top;
+    const mouseX = e.clientX - canvasRect.left + (canvasRef.current?.scrollLeft || 0);
+    const mouseY = e.clientY - canvasRect.top + (canvasRef.current?.scrollTop || 0);
     
     // Ensure elements is an array
     const elementArray = Array.isArray(elements) ? elements : [];
     
     // Update element position
-    setElements(elementArray.map(el => {
+    const updatedElements = elementArray.map(el => {
       if (el.id === selectedElementId) {
         return {
           ...el,
@@ -54,7 +54,9 @@ export const useElementDragging = ({
         };
       }
       return el;
-    }));
+    });
+    
+    setElements(updatedElements);
   };
 
   const stopDragging = () => {

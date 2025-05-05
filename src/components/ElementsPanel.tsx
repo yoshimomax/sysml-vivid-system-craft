@@ -50,6 +50,7 @@ const ElementItem = ({ type, icon, label, onDragStart }: ElementItemProps) => {
       className="flex flex-col items-center justify-center p-2 border border-border rounded-sm hover:bg-muted/50 hover:border-primary/30 cursor-grab transition-colors"
       draggable="true"
       onDragStart={handleDragStart}
+      data-element-type={type}
     >
       <div className="h-8 w-8 flex items-center justify-center text-primary/80">
         {icon}
