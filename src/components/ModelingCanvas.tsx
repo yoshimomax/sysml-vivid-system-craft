@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
-import { Element, Position, ElementType, Relationship, RelationshipType } from "@/types/sysml";
-import { v4 as uuidv4 } from "uuid";
-import { useToast } from "@/components/ui/use-toast";
+
+import { useRef } from "react";
+import { Element, Relationship } from "@/types/sysml";
 import { ElementRenderer } from "./modeling/ElementRenderer";
 import { RelationshipRenderer } from "./modeling/RelationshipRenderer";
-import { getDefaultSizeForType, calculateConnectionPoints } from "@/utils/elementUtils";
+import { useElementDragging } from "@/hooks/useElementDragging";
+import { useRelationshipCreation } from "@/hooks/useRelationshipCreation";
+import { ElementDropHandler } from "./modeling/ElementDropHandler";
 import "../styles/modeling.css";
 
 interface ModelingCanvasProps {
@@ -28,46 +29,30 @@ const ModelingCanvas = ({
   selectedRelationship,
   setSelectedRelationship
 }: ModelingCanvasProps) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
   
-  // State for relationship creation
-  const [isCreatingRelationship, setIsCreatingRelationship] = useState(false);
-  const [relationshipSource, setRelationshipSource] = useState<string | null>(null);
-  const [relationshipType, setRelationshipType] = useState<RelationshipType>("Dependency");
-  const [tempEndPoint, setTempEndPoint] = useState<Position | null>(null);
-
-  // Handle element drop from sidebar
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const elementType = e.dataTransfer.getData("application/sysml-element") as ElementType;
-    
-    if (!elementType) return;
-    
-    const canvasRect = canvasRef.current?.getBoundingClientRect();
-    if (!canvasRect) return;
-    
-    const x = e.clientX - canvasRect.left;
-    const y = e.clientY - canvasRect.top;
-    
-    const newElement: Element = {
-      id: uuidv4(),
-      type: elementType,
-      name: `New ${elementType}`,
-      position: { x, y },
-      size: getDefaultSizeForType(elementType),
-    };
-    
-    setElements([...elements, newElement]);
-    setSelectedElement(newElement);
-    
-    toast({
-      title: "Element added",
-      description: `Added new ${elementType} element to the diagram`,
-    });
-  };
+  // Use the element dragging hook
+  const { isDragging, startDragging, handleDragging, stopDragging } = useElementDragging({
+    elements,
+    setElements
+  });
+  
+  // Use the relationship creation hook
+  const { 
+    isCreatingRelationship,
+    relationshipSource,
+    relationshipType,
+    tempEndPoint,
+    startRelationship,
+    createRelationship,
+    handleCanvasMouseMove,
+    resetRelationshipCreation
+  } = useRelationshipCreation({
+    elements,
+    relationships,
+    setRelationships,
+    setSelectedRelationship
+  });
 
   const handleElementMouseDown = (e: React.MouseEvent, element: Element) => {
     e.stopPropagation();
@@ -78,73 +63,20 @@ const ModelingCanvas = ({
       // If we already have a source, this is the target
       if (relationshipSource && relationshipSource !== element.id) {
         createRelationship(relationshipSource, element.id);
-        setIsCreatingRelationship(false);
-        setRelationshipSource(null);
-        setTempEndPoint(null);
+        resetRelationshipCreation();
       }
       return;
     }
     
     setSelectedElement(element);
-    setSelectedRelationship(null); // 要素を選択したらリレーションシップの選択を解除
-    setIsDragging(true);
-    
-    // Calculate offset from element position to mouse position
-    const canvasRect = canvasRef.current?.getBoundingClientRect();
-    if (!canvasRect) return;
-    
-    const mouseX = e.clientX - canvasRect.left;
-    const mouseY = e.clientY - canvasRect.top;
-    
-    setDragOffset({
-      x: mouseX - element.position.x,
-      y: mouseY - element.position.y
-    });
-  };
-
-  const handleCanvasMouseMove = (e: React.MouseEvent) => {
-    // Update temporary end point for relationship line
-    if (isCreatingRelationship && relationshipSource) {
-      const canvasRect = canvasRef.current?.getBoundingClientRect();
-      if (!canvasRect) return;
-      
-      setTempEndPoint({
-        x: e.clientX - canvasRect.left,
-        y: e.clientY - canvasRect.top
-      });
-      return;
-    }
-    
-    // Handle element dragging
-    if (!isDragging || !selectedElement) return;
-    
-    const canvasRect = canvasRef.current?.getBoundingClientRect();
-    if (!canvasRect) return;
-    
-    const mouseX = e.clientX - canvasRect.left;
-    const mouseY = e.clientY - canvasRect.top;
-    
-    // Update element position
-    setElements(elements.map(el => {
-      if (el.id === selectedElement.id) {
-        return {
-          ...el,
-          position: {
-            x: mouseX - dragOffset.x,
-            y: mouseY - dragOffset.y
-          }
-        };
-      }
-      return el;
-    }));
+    setSelectedRelationship(null); // Deselect relationship when selecting an element
+    startDragging(e, element, canvasRef);
   };
 
   const handleCanvasClick = (e: React.MouseEvent) => {
     // If we're creating a relationship but clicked on the canvas, cancel the operation
     if (isCreatingRelationship && e.target === canvasRef.current) {
-      setIsCreatingRelationship(false);
-      setRelationshipSource(null);
-      setTempEndPoint(null);
+      resetRelationshipCreation();
       return;
     }
     
@@ -155,64 +87,6 @@ const ModelingCanvas = ({
     }
   };
 
-  const handleCanvasMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleCanvasMouseLeave = () => {
-    setIsDragging(false);
-  };
-
-  // Prevent default behavior for drag over to allow drop
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-  
-  // Start creating a relationship from an element
-  const startRelationship = (elementId: string, type: RelationshipType) => {
-    console.log(`Starting relationship from element: ${elementId}`);
-    setIsCreatingRelationship(true);
-    setRelationshipSource(elementId);
-    setRelationshipType(type);
-    
-    // リレーションシップ作成中は選択解除して視覚的に分かりやすくする
-    setSelectedElement(null);
-    setSelectedRelationship(null);
-  };
-  
-  // Create a relationship between two elements
-  const createRelationship = (sourceId: string, targetId: string) => {
-    console.log(`Creating relationship: ${sourceId} -> ${targetId}`);
-    const sourceElement = elements.find(el => el.id === sourceId);
-    const targetElement = elements.find(el => el.id === targetId);
-    
-    if (!sourceElement || !targetElement) {
-      console.error("Source or target element not found");
-      return;
-    }
-    
-    // Calculate connection points
-    const points = calculateConnectionPoints(sourceElement, targetElement);
-    
-    const newRelationship: Relationship = {
-      id: uuidv4(),
-      type: relationshipType,
-      sourceId,
-      targetId,
-      name: `${relationshipType} Relationship`,
-      points: [points.source, points.target]
-    };
-    
-    console.log("New relationship:", newRelationship);
-    setRelationships([...relationships, newRelationship]);
-    setSelectedRelationship(newRelationship);
-    
-    toast({
-      title: "Relationship created",
-      description: `Created new ${relationshipType} relationship`,
-    });
-  };
-  
   // Handle element context menu for relationship creation
   const handleElementContextMenu = (e: React.MouseEvent, element: Element) => {
     e.preventDefault();
@@ -228,35 +102,56 @@ const ModelingCanvas = ({
     setSelectedRelationship(relationship);
   };
 
+  const handleMouseMove = (e: React.MouseEvent) => {
+    // Handle relationship creation mouse move
+    if (isCreatingRelationship) {
+      handleCanvasMouseMove(e, canvasRef);
+      return;
+    }
+    
+    // Handle element dragging
+    if (isDragging && selectedElement) {
+      handleDragging(e, selectedElement.id, canvasRef);
+    }
+  };
+
+  const handleElementDrop = (newElement: Element) => {
+    setElements([...elements, newElement]);
+    setSelectedElement(newElement);
+  };
+
   return (
     <div
       ref={canvasRef}
       className="canvas-wrapper w-full h-full overflow-auto relative"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onMouseMove={handleCanvasMouseMove}
-      onMouseUp={handleCanvasMouseUp}
-      onMouseLeave={handleCanvasMouseLeave}
+      onMouseMove={handleMouseMove}
+      onMouseUp={stopDragging}
+      onMouseLeave={stopDragging}
       onClick={handleCanvasClick}
     >
-      <RelationshipRenderer
-        relationships={relationships}
-        elements={elements}
-        tempRelationship={{
-          sourceId: relationshipSource,
-          tempEndPoint,
-          type: relationshipType
-        }}
-        selectedRelationship={selectedRelationship}
-        onRelationshipClick={handleRelationshipClick}
-      />
-      
-      <ElementRenderer
-        elements={elements}
-        selectedElement={selectedElement}
-        onElementMouseDown={handleElementMouseDown}
-        onElementContextMenu={handleElementContextMenu}
-      />
+      <ElementDropHandler 
+        onElementDrop={handleElementDrop} 
+        canvasRef={canvasRef}
+      >
+        <RelationshipRenderer
+          relationships={relationships}
+          elements={elements}
+          tempRelationship={{
+            sourceId: relationshipSource,
+            tempEndPoint,
+            type: relationshipType
+          }}
+          selectedRelationship={selectedRelationship}
+          onRelationshipClick={handleRelationshipClick}
+        />
+        
+        <ElementRenderer
+          elements={elements}
+          selectedElement={selectedElement}
+          onElementMouseDown={handleElementMouseDown}
+          onElementContextMenu={handleElementContextMenu}
+        />
+      </ElementDropHandler>
     </div>
   );
 };
