@@ -40,13 +40,14 @@ interface ElementItemProps {
 const ElementItem = ({ type, icon, label, onDragStart }: ElementItemProps) => {
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("application/sysml-element", type);
+    e.dataTransfer.effectAllowed = "copy";
     onDragStart(type);
   };
 
   return (
     <div
       className="flex flex-col items-center justify-center p-2 border border-border rounded-sm hover:bg-muted/50 hover:border-primary/30 cursor-grab transition-colors"
-      draggable
+      draggable="true"
       onDragStart={handleDragStart}
     >
       <div className="h-8 w-8 flex items-center justify-center text-primary/80">

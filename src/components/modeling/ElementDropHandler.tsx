@@ -19,6 +19,8 @@ export const ElementDropHandler = ({
   
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     const elementType = e.dataTransfer.getData("application/sysml-element") as ElementType;
     
     if (!elementType) return;
@@ -26,8 +28,9 @@ export const ElementDropHandler = ({
     const canvasRect = canvasRef.current?.getBoundingClientRect();
     if (!canvasRect) return;
     
-    const x = e.clientX - canvasRect.left;
-    const y = e.clientY - canvasRect.top;
+    // Get correct position relative to the canvas, accounting for scroll
+    const x = e.clientX - canvasRect.left + (canvasRef.current?.scrollLeft || 0);
+    const y = e.clientY - canvasRect.top + (canvasRef.current?.scrollTop || 0);
     
     const newElement: Element = {
       id: uuidv4(),
@@ -47,10 +50,14 @@ export const ElementDropHandler = ({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    // Show allowed cursor
+    e.dataTransfer.dropEffect = "copy";
   };
   
   return (
     <div
+      className="w-full h-full"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >

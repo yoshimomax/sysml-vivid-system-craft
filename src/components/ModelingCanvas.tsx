@@ -116,7 +116,8 @@ const ModelingCanvas = ({
   };
 
   const handleElementDrop = (newElement: Element) => {
-    setElements([...elements, newElement]);
+    console.log('Element dropped:', newElement);
+    setElements(prevElements => [...prevElements, newElement]);
     setSelectedElement(newElement);
   };
 
@@ -133,24 +134,26 @@ const ModelingCanvas = ({
         onElementDrop={handleElementDrop} 
         canvasRef={canvasRef}
       >
-        <RelationshipRenderer
-          relationships={relationships}
-          elements={elements}
-          tempRelationship={{
-            sourceId: relationshipSource,
-            tempEndPoint,
-            type: relationshipType
-          }}
-          selectedRelationship={selectedRelationship}
-          onRelationshipClick={handleRelationshipClick}
-        />
-        
-        <ElementRenderer
-          elements={elements}
-          selectedElement={selectedElement}
-          onElementMouseDown={handleElementMouseDown}
-          onElementContextMenu={handleElementContextMenu}
-        />
+        <div className="absolute inset-0">
+          <RelationshipRenderer
+            relationships={relationships}
+            elements={elements}
+            tempRelationship={{
+              sourceId: relationshipSource,
+              tempEndPoint,
+              type: relationshipType
+            }}
+            selectedRelationship={selectedRelationship}
+            onRelationshipClick={handleRelationshipClick}
+          />
+          
+          <ElementRenderer
+            elements={elements}
+            selectedElement={selectedElement}
+            onElementMouseDown={handleElementMouseDown}
+            onElementContextMenu={handleElementContextMenu}
+          />
+        </div>
       </ElementDropHandler>
     </div>
   );
