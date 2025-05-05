@@ -1,102 +1,61 @@
 
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Element, Position, Relationship, RelationshipType } from "@/types/sysml";
-import { calculateConnectionPoints } from "@/utils/elementUtils";
-import { useToast } from "@/components/ui/use-toast";
+import { Position } from "../model/types";
+import { useModelingStore } from "../store/modelingStore";
+import { diagramEngine } from "../core/DiagramEngine";
 
-interface UseRelationshipCreationProps {
-  elements: Element[];
-  relationships: Relationship[];
-  setRelationships: (relationships: Relationship[]) => void;
-  setSelectedRelationship: (relationship: Relationship | null) => void;
-}
-
-export const useRelationshipCreation = ({
-  elements,
-  relationships,
-  setRelationships,
-  setSelectedRelationship,
-}: UseRelationshipCreationProps) => {
-  const [isCreatingRelationship, setIsCreatingRelationship] = useState(false);
-  const [relationshipSource, setRelationshipSource] = useState<string | null>(null);
-  const [relationshipType, setRelationshipType] = useState<RelationshipType>("Dependency");
+export const useRelationshipCreation = () => {
   const [tempEndPoint, setTempEndPoint] = useState<Position | null>(null);
-  const { toast } = useToast();
-
-  // Make sure elements and relationships are arrays
-  const elementArray = Array.isArray(elements) ? elements : [];
-  const relationshipArray = Array.isArray(relationships) ? relationships : [];
-
-  // Start creating a relationship from an element
-  const startRelationship = (elementId: string, type: RelationshipType) => {
-    console.log(`Starting relationship from element: ${elementId}`);
-    setIsCreatingRelationship(true);
-    setRelationshipSource(elementId);
-    setRelationshipType(type);
+  const isCreatingRelationship = useModelingStore(state => state.isCreatingRelationship);
+  const relationshipSourceId = useModelingStore(state => state.relationshipSourceId);
+  const relationshipType = useModelingStore(state => state.relationshipType);
+  
+  /**
+   * Start creating a relationship
+   */
+  const startRelationship = (sourceId: string, type: string) => {
+    diagramEngine.startRelationshipCreation(sourceId, type);
   };
-
-  // Create a relationship between two elements
-  const createRelationship = (sourceId: string, targetId: string) => {
-    console.log(`Creating relationship: ${sourceId} -> ${targetId}`);
-    const sourceElement = elementArray.find(el => el.id === sourceId);
-    const targetElement = elementArray.find(el => el.id === targetId);
+  
+  /**
+   * Handle mouse movement during relationship creation
+   */
+  const handleMouseMove = (e: React.MouseEvent, canvasRef: React.RefObject<HTMLDivElement>) => {
+    if (!isCreatingRelationship) return;
     
-    if (!sourceElement || !targetElement) {
-      console.error("Source or target element not found");
-      return;
-    }
+    const canvasRect = canvasRef.current?.getBoundingClientRect();
+    if (!canvasRect) return;
     
-    // Calculate connection points
-    const points = calculateConnectionPoints(sourceElement, targetElement);
-    
-    const newRelationship: Relationship = {
-      id: uuidv4(),
-      type: relationshipType,
-      sourceId,
-      targetId,
-      name: `${relationshipType} Relationship`,
-      points: [points.source, points.target]
-    };
-    
-    console.log("New relationship:", newRelationship);
-    setRelationships([...relationshipArray, newRelationship]);
-    setSelectedRelationship(newRelationship);
-    
-    toast({
-      title: "Relationship created",
-      description: `Created new ${relationshipType} relationship`,
+    setTempEndPoint({
+      x: e.clientX - canvasRect.left + (canvasRef.current?.scrollLeft || 0),
+      y: e.clientY - canvasRect.top + (canvasRef.current?.scrollTop || 0)
     });
   };
-
-  // Handle canvas mouse move for temporary relationship
-  const handleCanvasMouseMove = (e: React.MouseEvent, canvasRef: React.RefObject<HTMLDivElement>) => {
-    if (isCreatingRelationship && relationshipSource) {
-      const canvasRect = canvasRef.current?.getBoundingClientRect();
-      if (!canvasRect) return;
-      
-      setTempEndPoint({
-        x: e.clientX - canvasRect.left,
-        y: e.clientY - canvasRect.top
-      });
-    }
-  };
-
-  // Reset relationship creation state
-  const resetRelationshipCreation = () => {
-    setIsCreatingRelationship(false);
-    setRelationshipSource(null);
+  
+  /**
+   * Cancel relationship creation
+   */
+  const cancelRelationshipCreation = () => {
+    diagramEngine.cancelRelationshipCreation();
     setTempEndPoint(null);
   };
-
+  
+  /**
+   * Complete relationship creation by connecting to target
+   */
+  const completeRelationship = (targetId: string) => {
+    diagramEngine.completeRelationshipCreation(targetId);
+    setTempEndPoint(null);
+  };
+  
   return {
     isCreatingRelationship,
-    relationshipSource,
+    relationshipSourceId,
     relationshipType,
     tempEndPoint,
     startRelationship,
-    createRelationship,
-    handleCanvasMouseMove,
-    resetRelationshipCreation
+    handleMouseMove,
+    cancelRelationshipCreation,
+    completeRelationship
   };
 };
