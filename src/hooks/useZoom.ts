@@ -33,13 +33,12 @@ export const useZoom = ({
   }, []);
   
   const handleWheelZoom = useCallback((e: React.WheelEvent) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      if (e.deltaY < 0) {
-        zoomIn();
-      } else {
-        zoomOut();
-      }
+    // Remove the Ctrl/Cmd key requirement
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      zoomIn();
+    } else {
+      zoomOut();
     }
   }, [zoomIn, zoomOut]);
   
