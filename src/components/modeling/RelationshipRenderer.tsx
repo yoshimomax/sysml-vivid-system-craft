@@ -1,3 +1,4 @@
+
 import { Element, Position, Relationship, RelationshipType } from "@/types/sysml";
 import { calculateConnectionPoints } from "@/utils/elementUtils";
 

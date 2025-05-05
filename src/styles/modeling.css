@@ -58,6 +58,7 @@
   cursor: pointer;
   stroke: var(--foreground);
   transition: stroke-width 0.2s ease;
+  pointer-events: stroke;
 }
 
 .relationship-path:hover {
