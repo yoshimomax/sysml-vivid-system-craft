@@ -56,25 +56,27 @@
 /* Relationship styles */
 .relationship-path {
   cursor: pointer;
-  stroke: var(--foreground);
-  stroke-width: 1.5px;
+  stroke: currentColor !important;
+  stroke-width: 2px !important;
   fill: none;
   transition: stroke-width 0.2s ease;
-  pointer-events: stroke;
-  visibility: visible !important; /* Force visibility */
+  pointer-events: stroke !important;
 }
 
 .relationship-path:hover {
-  stroke-width: 2px;
+  stroke-width: 2.5px !important;
+  stroke: var(--primary) !important;
 }
 
 .relationship-path-selected {
-  stroke: var(--primary);
-  stroke-width: 2.5px;
+  stroke: var(--primary) !important;
+  stroke-width: 2.5px !important;
 }
 
 .relationship-path-temp {
   pointer-events: none;
+  stroke: currentColor !important;
+  stroke-width: 1.5px !important;
 }
 
 /* Handles for elements */
@@ -127,4 +129,13 @@
   font-size: 0.875rem;
   font-weight: 600;
   padding: 0.5rem 0.75rem;
+}
+
+/* Fix SVG visibility */
+svg {
+  overflow: visible;
+}
+
+.relationships-group path {
+  visibility: visible !important;
 }

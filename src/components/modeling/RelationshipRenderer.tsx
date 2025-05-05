@@ -74,7 +74,7 @@ export const RelationshipRenderer = ({
   };
 
   return (
-    <svg className="absolute top-0 left-0 w-full h-full">
+    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
       {/* SVG marker definitions */}
       <defs>
         <marker
@@ -112,19 +112,22 @@ export const RelationshipRenderer = ({
         </marker>
       </defs>
       
-      {/* Actual relationships */}
-      {relationships.map(relationship => (
-        <path
-          key={relationship.id}
-          d={getRelationshipPath(relationship)}
-          className={`relationship-path ${selectedRelationship?.id === relationship.id ? 'relationship-path-selected' : ''}`}
-          stroke="currentColor"
-          strokeWidth="1.5"
-          fill="none"
-          markerEnd={getMarkerEnd(relationship.type)}
-          onClick={(e) => onRelationshipClick(e, relationship)}
-        />
-      ))}
+      {/* Actual relationships - important to set pointer-events to stroke */}
+      <g className="relationships-group">
+        {relationships.map(relationship => (
+          <path
+            key={relationship.id}
+            d={getRelationshipPath(relationship)}
+            className="relationship-path"
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+            markerEnd={getMarkerEnd(relationship.type)}
+            onClick={(e) => onRelationshipClick(e, relationship)}
+            style={{ pointerEvents: 'stroke' }}
+          />
+        ))}
+      </g>
       
       {/* Temporary line for relationship creation */}
       {tempRelationship.sourceId && tempRelationship.tempEndPoint && (

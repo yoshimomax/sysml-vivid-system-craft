@@ -1,8 +1,10 @@
 
 /* Relationship styling */
 .relationship-path {
-  pointer-events: all;
+  pointer-events: stroke;
   cursor: pointer;
+  stroke: currentColor;
+  stroke-width: 2px;
 }
 
 .relationship-path:hover {
