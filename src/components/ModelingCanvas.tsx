@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Element, Position, ElementType, Size, Relationship, RelationshipType } from "@/types/sysml";
 import { v4 as uuidv4 } from "uuid";
@@ -11,6 +10,8 @@ interface ModelingCanvasProps {
   setRelationships: React.Dispatch<React.SetStateAction<Relationship[]>>;
   selectedElement: Element | null;
   setSelectedElement: React.Dispatch<React.SetStateAction<Element | null>>;
+  selectedRelationship: Relationship | null;
+  setSelectedRelationship: React.Dispatch<React.SetStateAction<Relationship | null>>;
 }
 
 const ModelingCanvas = ({
@@ -19,7 +20,9 @@ const ModelingCanvas = ({
   relationships,
   setRelationships,
   selectedElement,
-  setSelectedElement
+  setSelectedElement,
+  selectedRelationship,
+  setSelectedRelationship
 }: ModelingCanvasProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 });
@@ -165,6 +168,7 @@ const ModelingCanvas = ({
     // Deselect when clicking on the canvas background
     if (e.target === canvasRef.current) {
       setSelectedElement(null);
+      setSelectedRelationship(null);
     }
   };
 
@@ -269,6 +273,13 @@ const ModelingCanvas = ({
     }
   };
 
+  // Handle relationship click
+  const handleRelationshipClick = (e: React.MouseEvent, relationship: Relationship) => {
+    e.stopPropagation();
+    setSelectedElement(null);
+    setSelectedRelationship(relationship);
+  };
+
   const renderElements = () => {
     return elements.map((element) => (
       <div
@@ -349,11 +360,12 @@ const ModelingCanvas = ({
           <path
             key={relationship.id}
             d={getRelationshipPath(relationship, elements)}
-            className="relationship-path"
+            className={`relationship-path ${selectedRelationship?.id === relationship.id ? 'relationship-path-selected' : ''}`}
             stroke="currentColor"
             strokeWidth="1.5"
             fill="none"
             markerEnd={getMarkerEnd(relationship.type)}
+            onClick={(e) => handleRelationshipClick(e, relationship)}
           />
         ))}
         

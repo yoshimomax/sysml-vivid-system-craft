@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Diagram, Element, ElementType, Relationship } from "@/types/sysml";
@@ -57,14 +56,6 @@ const Index = () => {
     if (selectedRelationship && selectedRelationship.id === updatedRelationship.id) {
       setSelectedRelationship(updatedRelationship);
     }
-  };
-
-  const handleRelationshipSelect = (relationshipId: string) => {
-    // Deselect element when selecting a relationship
-    setSelectedElement(null);
-    
-    const relationship = relationships.find(r => r.id === relationshipId);
-    setSelectedRelationship(relationship || null);
   };
 
   const updateDiagramElements = (newElements: Element[]) => {
@@ -172,6 +163,8 @@ const Index = () => {
               setSelectedElement(element);
               setSelectedRelationship(null); // Deselect relationship when selecting an element
             }}
+            selectedRelationship={selectedRelationship}
+            setSelectedRelationship={setSelectedRelationship}
           />
         </div>
         
