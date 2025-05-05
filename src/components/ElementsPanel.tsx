@@ -39,6 +39,7 @@ interface ElementItemProps {
 
 const ElementItem = ({ type, icon, label, onDragStart }: ElementItemProps) => {
   const handleDragStart = (e: React.DragEvent) => {
+    console.log(`Started dragging a ${type} element`);
     e.dataTransfer.setData("application/sysml-element", type);
     e.dataTransfer.effectAllowed = "copy";
     onDragStart(type);

@@ -40,6 +40,7 @@ export const ElementDropHandler = ({
       size: getDefaultSizeForType(elementType),
     };
     
+    console.log("Creating new element:", newElement);
     onElementDrop(newElement);
     
     toast({

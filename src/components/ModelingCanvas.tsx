@@ -121,9 +121,10 @@ const ModelingCanvas = ({
 
   const handleElementDrop = (newElement: Element) => {
     console.log('Element dropped:', newElement);
-    setElements(prevElements => {
-      const elements = Array.isArray(prevElements) ? prevElements : [];
-      return [...elements, newElement];
+    setElements(prev => {
+      // Ensure prev is an array
+      const prevElements = Array.isArray(prev) ? prev : [];
+      return [...prevElements, newElement];
     });
     setSelectedElement(newElement);
   };

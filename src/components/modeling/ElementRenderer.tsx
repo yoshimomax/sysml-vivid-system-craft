@@ -17,6 +17,10 @@ export const ElementRenderer = ({
   // Make sure elements is an array
   const elementArray = Array.isArray(elements) ? elements : [];
   
+  if (elementArray.length === 0) {
+    return null; // Nothing to render
+  }
+  
   return (
     <>
       {elementArray.map((element) => (
@@ -32,7 +36,7 @@ export const ElementRenderer = ({
           data-type={element.type}
           onMouseDown={(e) => onElementMouseDown(e, element)}
           onContextMenu={(e) => {
-            e.preventDefault(); // 重要: 右クリックのデフォルト動作を防止
+            e.preventDefault();
             onElementContextMenu(e, element);
           }}
         >
