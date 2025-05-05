@@ -17,7 +17,10 @@ export const ElementRenderer = ({
   // Make sure elements is an array
   const elementArray = Array.isArray(elements) ? elements : [];
   
+  console.log("ElementRenderer rendering with elements:", elementArray);
+  
   if (elementArray.length === 0) {
+    console.log("ElementRenderer: No elements to render");
     return null; // Nothing to render
   }
   
@@ -33,6 +36,7 @@ export const ElementRenderer = ({
             width: `${element.size.width}px`,
             height: `${element.size.height}px`,
           }}
+          data-element-id={element.id}
           data-type={element.type}
           onMouseDown={(e) => onElementMouseDown(e, element)}
           onContextMenu={(e) => {

@@ -35,6 +35,8 @@ const ModelingCanvas = ({
   const elementArray = Array.isArray(elements) ? elements : [];
   const relationshipArray = Array.isArray(relationships) ? relationships : [];
   
+  console.log("ModelingCanvas rendering with elements:", elementArray);
+  
   // Use the element dragging hook
   const { isDragging, startDragging, handleDragging, stopDragging } = useElementDragging({
     elements: elementArray,

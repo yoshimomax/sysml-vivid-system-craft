@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Diagram, Element, ElementType, Relationship } from "@/types/sysml";
@@ -25,8 +26,10 @@ const Index = () => {
   const { toast } = useToast();
 
   const activeDiagram = diagrams.find((d) => d.id === activeDiagramId) || diagrams[0];
-  const elements = activeDiagram.elements;
-  const relationships = activeDiagram.relationships;
+  const elements = activeDiagram.elements || [];
+  const relationships = activeDiagram.relationships || [];
+  
+  console.log("Index rendering with elements:", elements);
 
   const handleElementDragStart = (type: ElementType) => {
     console.log(`Started dragging a ${type} element`);
@@ -70,6 +73,7 @@ const Index = () => {
         return diagram;
       })
     );
+    console.log("Updated diagram elements:", newElements);
   };
 
   const updateDiagramRelationships = (newRelationships: Relationship[]) => {

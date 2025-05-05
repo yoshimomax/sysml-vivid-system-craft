@@ -23,10 +23,16 @@ export const ElementDropHandler = ({
     
     const elementType = e.dataTransfer.getData("application/sysml-element") as ElementType;
     
-    if (!elementType) return;
+    if (!elementType) {
+      console.log("No element type found in drag data");
+      return;
+    }
     
     const canvasRect = canvasRef.current?.getBoundingClientRect();
-    if (!canvasRect) return;
+    if (!canvasRect) {
+      console.log("No canvas rect found");
+      return;
+    }
     
     // Get correct position relative to the canvas, accounting for scroll
     const x = e.clientX - canvasRect.left + (canvasRef.current?.scrollLeft || 0);
