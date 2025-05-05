@@ -14,16 +14,19 @@ interface SelectionBoxProps {
 export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selectionBox }) => {
   if (!isSelecting || !selectionBox) return null;
 
+  const left = Math.min(selectionBox.startX, selectionBox.endX);
+  const top = Math.min(selectionBox.startY, selectionBox.endY);
+  const width = Math.abs(selectionBox.endX - selectionBox.startX);
+  const height = Math.abs(selectionBox.endY - selectionBox.startY);
+
   return (
     <div 
-      className="absolute border-2 border-blue-500 bg-blue-500/10"
+      className="absolute border-2 border-blue-500 bg-blue-500/10 selection-box"
       style={{
-        left: Math.min(selectionBox.startX, selectionBox.endX),
-        top: Math.min(selectionBox.startY, selectionBox.endY),
-        width: Math.abs(selectionBox.endX - selectionBox.startX),
-        height: Math.abs(selectionBox.endY - selectionBox.startY),
-        zIndex: 1000,
-        pointerEvents: 'none'
+        left,
+        top,
+        width,
+        height
       }}
     />
   );

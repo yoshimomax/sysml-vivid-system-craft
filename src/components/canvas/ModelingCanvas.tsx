@@ -47,12 +47,13 @@ export const ModelingCanvas: React.FC = () => {
   // Canvas interactions hook
   const {
     contextMenuPosition,
-    setContextMenuPosition, // Get this function from the hook
+    setContextMenuPosition,
     elementForContextMenu,
     isSelecting,
     selectionBox,
     handleCanvasClick,
     handleCanvasContextMenu,
+    handleCanvasMouseDown,
     handleElementContextMenu,
     handleRelationshipClick,
     handleRelationshipTypeSelect,
@@ -84,6 +85,7 @@ export const ModelingCanvas: React.FC = () => {
       <div
         ref={canvasRef}
         className="canvas-wrapper flex-1 overflow-auto relative"
+        onMouseDown={handleCanvasMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}

@@ -23,7 +23,7 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   const startSelection = useCallback((e: React.MouseEvent) => {
     console.log("Starting selection");
     // Only start selection if using the primary mouse button
-    if (e.button !== 0 || e.target !== canvasRef.current) return;
+    if (e.button !== 0) return;
     
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -94,12 +94,13 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
       // Apply current scale factor from the store to correctly calculate intersection
       const scale = useModelingStore.getState().scale || 1;
       
-      // Scale element bounds
+      // Element bounds adjusted by scale
       const scaledLeft = element.position.x * scale;
       const scaledTop = element.position.y * scale;
       const scaledRight = elementRight * scale;
       const scaledBottom = elementBottom * scale;
       
+      // Check if element intersects with the selection box
       return (
         scaledLeft < right &&
         scaledRight > left &&
@@ -110,11 +111,14 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     
     console.log("Selected elements:", selected);
     const selectedIds = selected.map(el => el.id);
-    setSelectedElementIds(selectedIds);
     
-    // Use direct call to avoid infinite updates
-    const selectMultipleElements = useModelingStore.getState().selectMultipleElements;
-    selectMultipleElements(selectedIds);
+    if (selectedIds.length > 0) {
+      setSelectedElementIds(selectedIds);
+      
+      // Use direct call to avoid infinite updates
+      const selectMultipleElements = useModelingStore.getState().selectMultipleElements;
+      selectMultipleElements(selectedIds);
+    }
     
     setIsSelecting(false);
     setSelectionBox(null);

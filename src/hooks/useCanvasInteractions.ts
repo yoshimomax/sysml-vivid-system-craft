@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback } from "react";
 import { Position } from "../model/types";
 import { diagramEngine } from "../core/DiagramEngine";
@@ -50,24 +51,22 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
   
   // Handle canvas click
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === canvasRef.current) {
-      // If relationship creation is in progress, cancel it
-      if (isCreatingRelationship) {
-        cancelRelationshipCreation();
-        return;
-      }
-      
-      // Start multi-selection
-      if (!isSelecting && !isDragging) {
-        startSelection(e);
-        return;
-      }
-      
-      // Otherwise deselect element/relationship
+    // Only process if target is the canvas itself
+    if (e.target !== canvasRef.current) return;
+    
+    // If relationship creation is in progress, cancel it
+    if (isCreatingRelationship) {
+      cancelRelationshipCreation();
+      return;
+    }
+    
+    // If not selecting or dragging, deselect all
+    if (!isSelecting && !isDragging) {
       diagramEngine.selectElement(null);
       diagramEngine.selectRelationship(null);
+      diagramEngine.selectMultipleElements([]);
     }
-  }, [canvasRef, isCreatingRelationship, cancelRelationshipCreation, isSelecting, isDragging, startSelection]);
+  }, [canvasRef, isCreatingRelationship, cancelRelationshipCreation, isSelecting, isDragging]);
   
   // Handle canvas context menu
   const handleCanvasContextMenu = useCallback((e: React.MouseEvent) => {
@@ -123,13 +122,31 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
       return;
     }
     
-    handleDragEnd();
-  }, [isSelecting, endSelection, handleDragEnd]);
+    if (isDragging) {
+      handleDragEnd();
+    }
+  }, [isSelecting, endSelection, isDragging, handleDragEnd]);
+  
+  // Mouse down handler for canvas
+  const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
+    // Only start selection with left mouse button
+    if (e.button !== 0) return;
+    
+    // Only if clicked directly on canvas, not on an element
+    if (e.target === canvasRef.current) {
+      startSelection(e);
+    }
+  }, [canvasRef, startSelection]);
   
   const handleMouseLeave = useCallback(() => {
-    handleDragEnd();
-    cancelSelection();
-  }, [handleDragEnd, cancelSelection]);
+    if (isDragging) {
+      handleDragEnd();
+    }
+    
+    if (isSelecting) {
+      cancelSelection();
+    }
+  }, [handleDragEnd, cancelSelection, isDragging, isSelecting]);
   
   return {
     // States
@@ -143,6 +160,7 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
     setElementForContextMenu,
     handleCanvasClick,
     handleCanvasContextMenu,
+    handleCanvasMouseDown,
     handleElementContextMenu,
     handleRelationshipClick,
     handleRelationshipTypeSelect,

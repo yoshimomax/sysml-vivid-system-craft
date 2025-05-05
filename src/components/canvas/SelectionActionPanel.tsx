@@ -21,10 +21,11 @@ export const SelectionActionPanel: React.FC<SelectionActionPanelProps> = ({
   onDelete,
   onAlign
 }) => {
-  if (selectedIds.length <= 1) return null;
+  // 選択された要素が2つ未満の場合は表示しない
+  if (!selectedIds || selectedIds.length <= 1) return null;
   
   return (
-    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-card shadow-md rounded-lg border flex items-center gap-1 p-1 z-50">
+    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-card shadow-lg rounded-lg border flex items-center gap-1 p-1 z-50">
       <div className="px-2 border-r">
         <span className="text-xs font-medium">{selectedIds.length} selected</span>
       </div>
