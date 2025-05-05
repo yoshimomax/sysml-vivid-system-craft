@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import ModelingHeader from "@/components/ModelingHeader";
@@ -8,40 +8,45 @@ import { ElementsPanel } from "@/components/panels/ElementsPanel";
 import { ModelingCanvas } from "@/components/canvas/ModelingCanvas";
 import PropertiesPanel from "@/components/PropertiesPanel";
 import { useModelingStore } from "@/store/modelingStore";
-import { v4 as uuidv4 } from "uuid";
 
 const Index = () => {
   const { toast } = useToast();
-  const project = useModelingStore(state => state.project);
+  
+  // Use selectors with primitive values where possible to prevent unnecessary rerenders
+  const projectId = useModelingStore(state => state.project.id);
+  const diagrams = useModelingStore(state => state.project.diagrams);
   const activeDiagramId = useModelingStore(state => state.activeDiagramId);
-  const selectDiagram = useModelingStore(state => state.selectDiagram);
-  const addDiagram = useModelingStore(state => state.addDiagram);
-  const removeDiagram = useModelingStore(state => state.removeDiagram);
+  
+  // Memoize store functions to prevent unnecessary renders
+  const selectDiagram = useMemo(() => useModelingStore.getState().selectDiagram, []);
+  const addDiagram = useMemo(() => useModelingStore.getState().addDiagram, []);
+  const removeDiagram = useMemo(() => useModelingStore.getState().removeDiagram, []);
+  const updateElement = useMemo(() => useModelingStore.getState().updateElement, []);
+  const updateRelationship = useMemo(() => useModelingStore.getState().updateRelationship, []);
+  
+  // Get selected elements outside of render to prevent infinite loops
   const selectedElement = useModelingStore(state => state.getSelectedElement());
-  const selectedElements = useModelingStore(state => state.getSelectedElements());
   const selectedRelationship = useModelingStore(state => state.getSelectedRelationship());
-  const updateElement = useModelingStore(state => state.updateElement);
-  const updateRelationship = useModelingStore(state => state.updateRelationship);
   
   // Initialize active diagram if not set
   useEffect(() => {
-    if (project.diagrams.length > 0 && !activeDiagramId) {
-      selectDiagram(project.diagrams[0].id);
+    if (diagrams.length > 0 && !activeDiagramId) {
+      selectDiagram(diagrams[0].id);
     }
-  }, [project, activeDiagramId, selectDiagram]);
+  }, [diagrams, activeDiagramId, selectDiagram]);
 
   const handleAddDiagram = () => {
-    addDiagram(`New Diagram ${project.diagrams.length + 1}`, 'Structure');
+    addDiagram(`New Diagram ${diagrams.length + 1}`, 'Structure');
 
     toast({
       title: "Diagram created",
-      description: `Created new diagram: New Diagram ${project.diagrams.length + 1}`,
+      description: `Created new diagram: New Diagram ${diagrams.length + 1}`,
     });
   };
 
   const handleCloseDiagram = (diagramId: string) => {
     // Don't allow closing the last diagram
-    if (project.diagrams.length <= 1) {
+    if (diagrams.length <= 1) {
       toast({
         title: "Cannot close diagram",
         description: "At least one diagram must remain open",
@@ -72,7 +77,7 @@ const Index = () => {
       <ModelingHeader />
       
       <DiagramTabs
-        diagrams={project.diagrams}
+        diagrams={diagrams}
         activeDiagramId={activeDiagramId}
         onDiagramSelect={selectDiagram}
         onAddDiagram={handleAddDiagram}

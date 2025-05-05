@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Position } from "../model/types";
 import { diagramEngine } from "../core/DiagramEngine";
 import { useModelingStore } from "../store/modelingStore";
@@ -10,20 +10,23 @@ export const useElementDrag = () => {
   const startDragging = useModelingStore(state => state.startDragging);
   const stopDragging = useModelingStore(state => state.stopDragging);
   const selectedElement = useModelingStore(state => state.getSelectedElement());
+  const updateElement = useModelingStore(state => state.updateElement);
   
   /**
    * Start dragging an element
    */
-  const handleDragStart = (e: React.MouseEvent, elementId: string, canvasRef: React.RefObject<HTMLDivElement>) => {
+  const handleDragStart = useCallback((e: React.MouseEvent, elementId: string, canvasRef: React.RefObject<HTMLDivElement>) => {
     e.stopPropagation();
     
     // Check if we're already creating a relationship
     const isCreatingRelationship = useModelingStore.getState().isCreatingRelationship;
     if (isCreatingRelationship) {
-      diagramEngine.completeRelationshipCreation(elementId);
+      const completeRelationship = useModelingStore.getState().completeRelationship;
+      completeRelationship(elementId);
       return;
     }
     
+    // Use direct store method to avoid unnecessary re-renders
     diagramEngine.selectElement(elementId);
     
     // Calculate offset from mouse position to element top-left
@@ -42,12 +45,12 @@ export const useElementDrag = () => {
     });
     
     startDragging();
-  };
+  }, [startDragging]);
   
   /**
    * Handle element dragging
    */
-  const handleDrag = (e: React.MouseEvent, canvasRef: React.RefObject<HTMLDivElement>) => {
+  const handleDrag = useCallback((e: React.MouseEvent, canvasRef: React.RefObject<HTMLDivElement>) => {
     if (!isDragging || !selectedElement) return;
     
     const canvasRect = canvasRef.current?.getBoundingClientRect();
@@ -61,20 +64,18 @@ export const useElementDrag = () => {
       y: mouseY - dragOffset.y
     };
     
-    // Update the element position in the store
-    useModelingStore.getState().updateElement(selectedElement.id, { 
-      position: newPosition 
-    });
-  };
+    // Use direct store method to update element position
+    updateElement(selectedElement.id, { position: newPosition });
+  }, [isDragging, selectedElement, dragOffset, updateElement]);
   
   /**
    * Handle drag end
    */
-  const handleDragEnd = () => {
-    if (isDragging && selectedElement) {
+  const handleDragEnd = useCallback(() => {
+    if (isDragging) {
       stopDragging();
     }
-  };
+  }, [isDragging, stopDragging]);
   
   return {
     isDragging,

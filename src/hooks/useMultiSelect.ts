@@ -1,6 +1,5 @@
 
-import { useState, useCallback, RefObject } from "react";
-import { Position } from "../model/types";
+import { useState, useCallback, RefObject, useMemo } from "react";
 import { diagramEngine } from "../core/DiagramEngine";
 import { useModelingStore } from "../store/modelingStore";
 
@@ -14,8 +13,11 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   } | null>(null);
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
   
-  const activeDiagram = useModelingStore(state => state.getActiveDiagram());
-  const elements = activeDiagram?.elements || [];
+  // Get elements from store without subscribing to all changes
+  const getElements = useCallback(() => {
+    const activeDiagram = useModelingStore.getState().getActiveDiagram();
+    return activeDiagram?.elements || [];
+  }, []);
   
   // Start selection process
   const startSelection = useCallback((e: React.MouseEvent) => {
@@ -60,7 +62,11 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   
   // End selection process and determine selected elements
   const endSelection = useCallback(() => {
-    if (!isSelecting || !selectionBox) return;
+    if (!isSelecting || !selectionBox) {
+      setIsSelecting(false);
+      setSelectionBox(null);
+      return;
+    }
     
     // Convert selection box to normalized coordinates (top-left to bottom-right)
     const left = Math.min(selectionBox.startX, selectionBox.endX);
@@ -74,6 +80,8 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
       setSelectionBox(null);
       return;
     }
+    
+    const elements = getElements();
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
@@ -91,14 +99,13 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     const selectedIds = selected.map(el => el.id);
     setSelectedElementIds(selectedIds);
     
-    // If exactly one element was selected, update the store's selected element
-    if (selectedIds.length === 1) {
-      diagramEngine.selectElement(selectedIds[0]);
-    }
+    // Use direct call to avoid infinite updates
+    const selectMultipleElements = useModelingStore.getState().selectMultipleElements;
+    selectMultipleElements(selectedIds);
     
     setIsSelecting(false);
     setSelectionBox(null);
-  }, [isSelecting, selectionBox, elements]);
+  }, [isSelecting, selectionBox, getElements]);
   
   // Abort selection
   const cancelSelection = useCallback(() => {

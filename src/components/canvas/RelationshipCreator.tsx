@@ -42,12 +42,12 @@ export const RelationshipCreator: React.FC<RelationshipCreatorProps> = ({
       description: "Containment relationship" 
     },
     { 
-      type: "Composition", 
+      type: "Dependency", 
       label: "Composition", 
       description: "Composite aggregation" 
     },
     { 
-      type: "Association", 
+      type: "Dependency", 
       label: "Association", 
       description: "General association" 
     }
@@ -66,7 +66,7 @@ export const RelationshipCreator: React.FC<RelationshipCreatorProps> = ({
         <div className="space-y-1 p-1">
           {relationshipTypes.map((item) => (
             <Button
-              key={item.type}
+              key={item.type + item.label}
               variant="ghost"
               className="w-full justify-start text-sm h-8 px-2"
               onClick={() => onSelectType(item.type)}
