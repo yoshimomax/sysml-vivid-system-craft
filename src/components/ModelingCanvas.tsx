@@ -1,7 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { Element, Position, ElementType, Size, Relationship, RelationshipType } from "@/types/sysml";
+
+import { useState, useRef } from "react";
+import { Element, Position, ElementType, Relationship, RelationshipType } from "@/types/sysml";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/components/ui/use-toast";
+import { ElementRenderer } from "./modeling/ElementRenderer";
+import { RelationshipRenderer } from "./modeling/RelationshipRenderer";
+import { getDefaultSizeForType, calculateConnectionPoint } from "@/utils/elementUtils";
 import "../styles/modeling.css";
 
 interface ModelingCanvasProps {
@@ -64,29 +68,6 @@ const ModelingCanvas = ({
       title: "Element added",
       description: `Added new ${elementType} element to the diagram`,
     });
-  };
-  
-  const getDefaultSizeForType = (type: ElementType): Size => {
-    switch (type) {
-      case "Part":
-        return { width: 180, height: 120 };
-      case "Requirement":
-        return { width: 200, height: 100 };
-      case "Package":
-        return { width: 220, height: 160 };
-      case "Action":
-      case "State":
-        return { width: 160, height: 100 };
-      case "Class":
-      case "Feature":
-        return { width: 180, height: 120 };
-      case "PortDefinition":
-        return { width: 140, height: 80 };
-      case "InterfaceDefinition":
-        return { width: 160, height: 100 };
-      default:
-        return { width: 160, height: 80 };
-    }
   };
 
   const handleElementMouseDown = (e: React.MouseEvent, element: Element) => {
@@ -219,59 +200,10 @@ const ModelingCanvas = ({
     });
   };
   
-  // Calculate the connection point on an element's border
-  const calculateConnectionPoint = (source: Element, target: Element): Position => {
-    // Simple implementation - just use center points for now
-    const sourceCenter = {
-      x: source.position.x + source.size.width / 2,
-      y: source.position.y + source.size.height / 2
-    };
-    
-    return sourceCenter;
-  };
-  
   // Handle element context menu for relationship creation
   const handleElementContextMenu = (e: React.MouseEvent, element: Element) => {
     e.preventDefault();
     startRelationship(element.id, "Dependency");
-  };
-
-  // Get the path for drawing a relationship line
-  const getRelationshipPath = (relationship: Relationship, elements: Element[]): string => {
-    const source = elements.find(el => el.id === relationship.sourceId);
-    const target = elements.find(el => el.id === relationship.targetId);
-    
-    if (!source || !target) return "";
-    
-    // Calculate source and target centers
-    const sourceCenter = {
-      x: source.position.x + source.size.width / 2,
-      y: source.position.y + source.size.height / 2
-    };
-    
-    const targetCenter = {
-      x: target.position.x + target.size.width / 2,
-      y: target.position.y + target.size.height / 2
-    };
-    
-    // For now, just draw a straight line between centers
-    return `M ${sourceCenter.x} ${sourceCenter.y} L ${targetCenter.x} ${targetCenter.y}`;
-  };
-  
-  // Get the marker end type based on relationship type
-  const getMarkerEnd = (type: RelationshipType): string => {
-    switch (type) {
-      case "Specialization":
-        return "url(#triangle)";
-      case "Dependency":
-        return "url(#arrow)";
-      case "Containment":
-        return "url(#diamond)";
-      case "Reference":
-        return "url(#arrow)";
-      default:
-        return "url(#arrow)";
-    }
   };
 
   // Handle relationship click
@@ -279,123 +211,6 @@ const ModelingCanvas = ({
     e.stopPropagation();
     setSelectedElement(null);
     setSelectedRelationship(relationship);
-  };
-
-  const renderElements = () => {
-    return elements.map((element) => (
-      <div
-        key={element.id}
-        className={`element-block absolute ${selectedElement?.id === element.id ? 'element-selected' : ''}`}
-        style={{
-          left: `${element.position.x}px`,
-          top: `${element.position.y}px`,
-          width: `${element.size.width}px`,
-          height: `${element.size.height}px`,
-        }}
-        data-type={element.type}
-        onMouseDown={(e) => handleElementMouseDown(e, element)}
-        onContextMenu={(e) => handleElementContextMenu(e, element)}
-      >
-        <div className="header">
-          {element.stereotype && <div className="text-xs text-muted-foreground">{`<<${element.stereotype}>>`}</div>}
-          {element.type}: {element.name}
-        </div>
-        <div className="content">
-          {element.description || "No description"}
-        </div>
-        
-        {/* Connection handles */}
-        {selectedElement?.id === element.id && (
-          <>
-            <div className="element-handle n" />
-            <div className="element-handle e" />
-            <div className="element-handle s" />
-            <div className="element-handle w" />
-          </>
-        )}
-      </div>
-    ));
-  };
-
-  const renderRelationships = () => {
-    return (
-      <>
-        {/* SVG marker definitions */}
-        <defs>
-          <marker
-            id="arrow"
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerWidth="6"
-            markerHeight="6"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-          </marker>
-          <marker
-            id="triangle"
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerWidth="6"
-            markerHeight="6"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="white" stroke="currentColor" strokeWidth="1" />
-          </marker>
-          <marker
-            id="diamond"
-            viewBox="0 0 12 12"
-            refX="6"
-            refY="6"
-            markerWidth="8"
-            markerHeight="8"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 6 L 6 0 L 12 6 L 6 12 z" fill="white" stroke="currentColor" strokeWidth="1" />
-          </marker>
-        </defs>
-        
-        {/* Actual relationships */}
-        {relationships.map(relationship => (
-          <path
-            key={relationship.id}
-            d={getRelationshipPath(relationship, elements)}
-            className={`relationship-path ${selectedRelationship?.id === relationship.id ? 'relationship-path-selected' : ''}`}
-            stroke="currentColor"
-            strokeWidth="1.5"
-            fill="none"
-            markerEnd={getMarkerEnd(relationship.type)}
-            onClick={(e) => handleRelationshipClick(e, relationship)}
-          />
-        ))}
-        
-        {/* Temporary line for relationship creation */}
-        {isCreatingRelationship && relationshipSource && tempEndPoint && (
-          <path
-            className="relationship-path-temp"
-            d={`M ${getElementCenter(relationshipSource).x} ${getElementCenter(relationshipSource).y} L ${tempEndPoint.x} ${tempEndPoint.y}`}
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeDasharray="5,5"
-            fill="none"
-            markerEnd={getMarkerEnd(relationshipType)}
-          />
-        )}
-      </>
-    );
-  };
-  
-  // Helper to get element center
-  const getElementCenter = (elementId: string): Position => {
-    const element = elements.find(el => el.id === elementId);
-    if (!element) return { x: 0, y: 0 };
-    
-    return {
-      x: element.position.x + element.size.width / 2,
-      y: element.position.y + element.size.height / 2
-    };
   };
 
   return (
@@ -409,10 +224,24 @@ const ModelingCanvas = ({
       onMouseLeave={handleCanvasMouseLeave}
       onClick={handleCanvasClick}
     >
-      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {renderRelationships()}
-      </svg>
-      {renderElements()}
+      <RelationshipRenderer
+        relationships={relationships}
+        elements={elements}
+        tempRelationship={{
+          sourceId: relationshipSource,
+          tempEndPoint,
+          type: relationshipType
+        }}
+        selectedRelationship={selectedRelationship}
+        onRelationshipClick={handleRelationshipClick}
+      />
+      
+      <ElementRenderer
+        elements={elements}
+        selectedElement={selectedElement}
+        onElementMouseDown={handleElementMouseDown}
+        onElementContextMenu={handleElementContextMenu}
+      />
     </div>
   );
 };
