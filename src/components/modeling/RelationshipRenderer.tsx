@@ -1,6 +1,7 @@
 
 import { Element, Position, Relationship, RelationshipType } from "@/types/sysml";
 import { calculateConnectionPoints } from "@/utils/elementUtils";
+import { useEffect } from "react";
 
 interface RelationshipRendererProps {
   relationships: Relationship[];
@@ -26,7 +27,10 @@ export const RelationshipRenderer = ({
     const source = elements.find(el => el.id === relationship.sourceId);
     const target = elements.find(el => el.id === relationship.targetId);
     
-    if (!source || !target) return "";
+    if (!source || !target) {
+      console.error(`Source or target element not found for relationship ${relationship.id}`);
+      return "";
+    }
     
     // Calculate connection points
     const points = calculateConnectionPoints(source, target);
@@ -34,6 +38,13 @@ export const RelationshipRenderer = ({
     // Draw path from source to target connection points
     return `M ${points.source.x} ${points.source.y} L ${points.target.x} ${points.target.y}`;
   };
+  
+  // Debug logging for relationships
+  useEffect(() => {
+    if (relationships.length > 0) {
+      console.log(`Rendering ${relationships.length} relationships`);
+    }
+  }, [relationships]);
   
   // Get the marker end type based on relationship type
   const getMarkerEnd = (type: RelationshipType): string => {
@@ -63,7 +74,7 @@ export const RelationshipRenderer = ({
   };
 
   return (
-    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+    <svg className="absolute top-0 left-0 w-full h-full">
       {/* SVG marker definitions */}
       <defs>
         <marker
@@ -111,7 +122,6 @@ export const RelationshipRenderer = ({
           strokeWidth="1.5"
           fill="none"
           markerEnd={getMarkerEnd(relationship.type)}
-          style={{ pointerEvents: 'stroke' }} // Enable click events on the path
           onClick={(e) => onRelationshipClick(e, relationship)}
         />
       ))}
@@ -126,7 +136,6 @@ export const RelationshipRenderer = ({
           strokeDasharray="5,5"
           fill="none"
           markerEnd={getMarkerEnd(tempRelationship.type)}
-          style={{ pointerEvents: 'none' }}
         />
       )}
     </svg>

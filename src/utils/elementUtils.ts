@@ -42,20 +42,49 @@ export const calculateConnectionPoint = (source: Element, target: Element): Posi
   const dx = targetCenter.x - sourceCenter.x;
   const dy = targetCenter.y - sourceCenter.y;
   
-  // Determine which edge of the source element to use
+  // Source element bounds
+  const sourceLeft = source.position.x;
+  const sourceRight = source.position.x + source.size.width;
+  const sourceTop = source.position.y;
+  const sourceBottom = source.position.y + source.size.height;
+  
+  // Target element bounds
+  const targetLeft = target.position.x;
+  const targetRight = target.position.x + target.size.width;
+  const targetTop = target.position.y;
+  const targetBottom = target.position.y + target.size.height;
+  
+  // Calculate intersection with source element border
+  let sourceX = sourceCenter.x;
+  let sourceY = sourceCenter.y;
+  
+  const slope = dy / dx; // Slope of the line between centers
+  
   if (Math.abs(dx) > Math.abs(dy)) {
-    // Horizontal connection (left or right edge)
-    const x = dx > 0 ? source.position.x + source.size.width : source.position.x;
-    const ratio = dx === 0 ? 0 : dy / dx;
-    const y = sourceCenter.y + ratio * (x - sourceCenter.x);
-    return { x, y };
+    // Line is more horizontal than vertical
+    if (dx > 0) {
+      // Target is to the right
+      sourceX = sourceRight;
+      sourceY = sourceCenter.y + slope * (sourceRight - sourceCenter.x);
+    } else {
+      // Target is to the left
+      sourceX = sourceLeft;
+      sourceY = sourceCenter.y + slope * (sourceLeft - sourceCenter.x);
+    }
   } else {
-    // Vertical connection (top or bottom edge)
-    const y = dy > 0 ? source.position.y + source.size.height : source.position.y;
-    const ratio = dy === 0 ? 0 : dx / dy;
-    const x = sourceCenter.x + ratio * (y - sourceCenter.y);
-    return { x, y };
+    // Line is more vertical than horizontal
+    if (dy > 0) {
+      // Target is below
+      sourceY = sourceBottom;
+      sourceX = dx === 0 ? sourceCenter.x : sourceCenter.x + (sourceBottom - sourceCenter.y) / slope;
+    } else {
+      // Target is above
+      sourceY = sourceTop;
+      sourceX = dx === 0 ? sourceCenter.x : sourceCenter.x + (sourceTop - sourceCenter.y) / slope;
+    }
   }
+  
+  return { x: sourceX, y: sourceY };
 };
 
 // Calculate connection points for both source and target

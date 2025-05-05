@@ -57,8 +57,11 @@
 .relationship-path {
   cursor: pointer;
   stroke: var(--foreground);
+  stroke-width: 1.5px;
+  fill: none;
   transition: stroke-width 0.2s ease;
   pointer-events: stroke;
+  visibility: visible !important; /* Force visibility */
 }
 
 .relationship-path:hover {
