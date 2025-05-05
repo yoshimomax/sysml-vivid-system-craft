@@ -1,7 +1,7 @@
 
 import { useState, useCallback, RefObject, useMemo } from "react";
 import { diagramEngine } from "../core/DiagramEngine";
-import { useModelingStore } from "../store/modelingStore";
+import { useModelingStore } from "../store";
 
 export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   const [isSelecting, setIsSelecting] = useState(false);

@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import { Position } from "../model/types";
 import { diagramEngine } from "../core/DiagramEngine";
-import { useModelingStore } from "../store/modelingStore";
+import { useModelingStore } from "../store";
 
 export const useElementDrag = () => {
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 });

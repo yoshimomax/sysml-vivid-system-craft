@@ -1,7 +1,7 @@
 import { Element, Relationship, Position, ElementType, Size } from "../model/types";
 import { v4 as uuidv4 } from "uuid";
-import { useModelingStore } from "../store/modelingStore";
-import { eventBus, DiagramEvents } from "./EventBus";
+import { useModelingStore } from "../store";
+import { eventBus, DiagramEventsExtended } from "./EventBus";
 import { Command, commandHistory } from "./CommandSystem";
 
 /**

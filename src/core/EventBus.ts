@@ -1,59 +1,41 @@
 
-type EventHandler = (...args: any[]) => void;
-
-/**
- * EventBus for communication between components
- */
-class EventBus {
-  private handlers: Record<string, EventHandler[]> = {};
+// Import existing code or create if it doesn't exist
+export const eventBus = {
+  events: {} as Record<string, Array<(data?: any) => void>>,
   
-  /**
-   * Subscribe to an event
-   */
-  subscribe(event: string, handler: EventHandler): () => void {
-    if (!this.handlers[event]) {
-      this.handlers[event] = [];
+  subscribe(event: string, callback: (data?: any) => void) {
+    if (!this.events[event]) {
+      this.events[event] = [];
     }
+    this.events[event].push(callback);
     
-    this.handlers[event].push(handler);
-    
-    // Return unsubscribe function
     return () => {
-      this.handlers[event] = this.handlers[event].filter(h => h !== handler);
+      this.events[event] = this.events[event].filter(cb => cb !== callback);
     };
-  }
+  },
   
-  /**
-   * Publish an event with data
-   */
-  publish(event: string, ...args: any[]): void {
-    const handlers = this.handlers[event];
-    if (handlers) {
-      handlers.forEach(handler => handler(...args));
+  publish(event: string, data?: any) {
+    if (this.events[event]) {
+      this.events[event].forEach(callback => callback(data));
     }
   }
-  
-  /**
-   * Clear all event handlers
-   */
-  clear(): void {
-    this.handlers = {};
-  }
-}
+};
 
-// Create a singleton instance
-export const eventBus = new EventBus();
-
-// Event types
+// Define diagram events
 export const DiagramEvents = {
+  DIAGRAM_CHANGED: 'diagram:changed',
   ELEMENT_ADDED: 'element:added',
-  ELEMENT_REMOVED: 'element:removed',
   ELEMENT_UPDATED: 'element:updated',
+  ELEMENT_REMOVED: 'element:removed',
   ELEMENT_SELECTED: 'element:selected',
   RELATIONSHIP_ADDED: 'relationship:added',
-  RELATIONSHIP_REMOVED: 'relationship:removed',
   RELATIONSHIP_UPDATED: 'relationship:updated',
-  RELATIONSHIP_SELECTED: 'relationship:selected',
-  DIAGRAM_CHANGED: 'diagram:changed',
-  DIAGRAM_CLEARED: 'diagram:cleared'
+  RELATIONSHIP_REMOVED: 'relationship:removed',
+  RELATIONSHIP_SELECTED: 'relationship:selected'
+};
+
+// Export extended version of DiagramEvents from here as well for compatibility
+export const DiagramEventsExtended = {
+  ...DiagramEvents,
+  MULTIPLE_ELEMENTS_SELECTED: 'elements:selected'
 };
