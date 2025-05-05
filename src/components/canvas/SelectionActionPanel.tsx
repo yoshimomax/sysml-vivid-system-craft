@@ -2,12 +2,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { 
-  AlignCenter, 
-  AlignStartHorizontal, 
   AlignLeft, 
-  AlignRight, 
-  AlignStartVertical, 
-  Trash2 
+  AlignCenter, 
+  AlignRight,
+  ArrowDown,
+  ArrowUp,
+  Trash2
 } from "lucide-react";
 
 interface SelectionActionPanelProps {
@@ -46,7 +46,7 @@ export const SelectionActionPanel: React.FC<SelectionActionPanelProps> = ({
           onClick={() => onAlign('center')}
           title="Align Center"
         >
-          <AlignStartHorizontal className="h-4 w-4" />
+          <AlignCenter className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
@@ -67,7 +67,7 @@ export const SelectionActionPanel: React.FC<SelectionActionPanelProps> = ({
           onClick={() => onAlign('top')}
           title="Align Top"
         >
-          <AlignCenter className="h-4 w-4 rotate-90" />
+          <ArrowUp className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
@@ -76,7 +76,7 @@ export const SelectionActionPanel: React.FC<SelectionActionPanelProps> = ({
           onClick={() => onAlign('middle')}
           title="Align Middle"
         >
-          <AlignStartVertical className="h-4 w-4" />
+          <AlignCenter className="h-4 w-4 rotate-90" />
         </Button>
         <Button
           variant="ghost"
@@ -85,7 +85,7 @@ export const SelectionActionPanel: React.FC<SelectionActionPanelProps> = ({
           onClick={() => onAlign('bottom')}
           title="Align Bottom"
         >
-          <AlignCenter className="h-4 w-4 -rotate-90" />
+          <ArrowDown className="h-4 w-4" />
         </Button>
       </div>
       

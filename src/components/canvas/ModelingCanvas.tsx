@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useModelingStore, DiagramEventsExtended } from "../../store/modelingStore";
 import { diagramEngine } from "../../core/DiagramEngine";
 import { GridLayer } from "./GridLayer";
@@ -13,7 +13,9 @@ import { useMultiSelect } from "../../hooks/useMultiSelect";
 import { MinimapPanel } from "./MinimapPanel";
 import { SelectionActionPanel } from "./SelectionActionPanel";
 import { RelationshipCreator } from "./RelationshipCreator";
+import { HelpTooltip } from "./HelpTooltip"; // Import the HelpTooltip
 import { Position, RelationshipType } from "../../model/types";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import "../../styles/modeling.css";
 
 export const ModelingCanvas: React.FC = () => {
@@ -21,6 +23,15 @@ export const ModelingCanvas: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState<Position | null>(null);
   const [elementForContextMenu, setElementForContextMenu] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(true); // Show help tooltip by default
+  
+  // Hide help tooltip after 10 seconds
+  useEffect(() => {
+    if (showHelp) {
+      const timer = setTimeout(() => setShowHelp(false), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [showHelp]);
   
   // Get states from store
   const scale = useModelingStore(state => state.scale);
@@ -81,7 +92,7 @@ export const ModelingCanvas: React.FC = () => {
     }
   }, [localSelectedIds]);
   
-  // Handle canvas click - deselect when clicking on the canvas background
+  // Handle canvas click
   const handleCanvasClick = (e: React.MouseEvent) => {
     if (e.target === canvasRef.current) {
       // If relationship creation is in progress, cancel it
@@ -112,6 +123,7 @@ export const ModelingCanvas: React.FC = () => {
   // Handle element context menu for relationship creation
   const handleElementContextMenu = (e: React.MouseEvent, elementId: string) => {
     e.preventDefault();
+    e.stopPropagation();
     setContextMenuPosition({ x: e.clientX, y: e.clientY });
     setElementForContextMenu(elementId);
   };
@@ -187,20 +199,27 @@ export const ModelingCanvas: React.FC = () => {
         onContextMenu={handleCanvasContextMenu}
         onWheel={handleWheelZoom}
       >
+        {/* Help tooltip */}
+        <HelpTooltip visible={showHelp} />
+        
         {/* Multi-selection action panel */}
-        <SelectionActionPanel
-          selectedIds={selectedElementIds}
-          onDelete={handleDeleteMultipleElements}
-          onAlign={handleAlignElements}
-        />
+        {selectedElementIds.length > 1 && (
+          <SelectionActionPanel
+            selectedIds={selectedElementIds}
+            onDelete={handleDeleteMultipleElements}
+            onAlign={handleAlignElements}
+          />
+        )}
         
         {/* Relationship type selector context menu */}
-        <RelationshipCreator
-          visible={!!contextMenuPosition && !!elementForContextMenu}
-          position={contextMenuPosition || { x: 0, y: 0 }}
-          onSelectType={handleRelationshipTypeSelect}
-          onCancel={() => setContextMenuPosition(null)}
-        />
+        {contextMenuPosition && elementForContextMenu && (
+          <RelationshipCreator
+            visible={!!contextMenuPosition && !!elementForContextMenu}
+            position={contextMenuPosition}
+            onSelectType={handleRelationshipTypeSelect}
+            onCancel={() => setContextMenuPosition(null)}
+          />
+        )}
         
         <DropLayer canvasRef={canvasRef}>
           <div 
@@ -239,6 +258,8 @@ export const ModelingCanvas: React.FC = () => {
                   top: Math.min(selectionBox.startY, selectionBox.endY),
                   width: Math.abs(selectionBox.endX - selectionBox.startX),
                   height: Math.abs(selectionBox.endY - selectionBox.startY),
+                  zIndex: 1000,
+                  pointerEvents: 'none'
                 }}
               />
             )}

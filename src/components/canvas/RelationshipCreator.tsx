@@ -55,11 +55,12 @@ export const RelationshipCreator: React.FC<RelationshipCreatorProps> = ({
   
   return (
     <div
-      className="absolute bg-card rounded-md shadow-md border p-1 z-50 w-48"
+      className="fixed bg-card rounded-md shadow-md border p-1 z-[9999]"
       style={{
         left: position.x,
         top: position.y
       }}
+      onClick={(e) => e.stopPropagation()}
     >
       <div className="text-sm font-medium p-2 border-b">Create Relationship</div>
       <ScrollArea className="max-h-64">

@@ -21,7 +21,8 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   
   // Start selection process
   const startSelection = useCallback((e: React.MouseEvent) => {
-    // Only start selection if using the primary mouse button and not pressing Shift
+    console.log("Starting selection");
+    // Only start selection if using the primary mouse button
     if (e.button !== 0 || e.target !== canvasRef.current) return;
     
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -62,6 +63,7 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   
   // End selection process and determine selected elements
   const endSelection = useCallback(() => {
+    console.log("Ending selection", isSelecting, selectionBox);
     if (!isSelecting || !selectionBox) {
       setIsSelecting(false);
       setSelectionBox(null);
@@ -75,27 +77,38 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     const bottom = Math.max(selectionBox.startY, selectionBox.endY);
     
     // Selection too small - could be a click
-    if (Math.abs(right - left) < 10 && Math.abs(bottom - top) < 10) {
+    if (Math.abs(right - left) < 5 || Math.abs(bottom - top) < 5) {
       setIsSelecting(false);
       setSelectionBox(null);
       return;
     }
     
     const elements = getElements();
+    console.log("Found elements:", elements);
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
       const elementRight = element.position.x + element.size.width;
       const elementBottom = element.position.y + element.size.height;
       
+      // Apply current scale factor from the store to correctly calculate intersection
+      const scale = useModelingStore.getState().scale || 1;
+      
+      // Scale element bounds
+      const scaledLeft = element.position.x * scale;
+      const scaledTop = element.position.y * scale;
+      const scaledRight = elementRight * scale;
+      const scaledBottom = elementBottom * scale;
+      
       return (
-        element.position.x < right &&
-        elementRight > left &&
-        element.position.y < bottom &&
-        elementBottom > top
+        scaledLeft < right &&
+        scaledRight > left &&
+        scaledTop < bottom &&
+        scaledBottom > top
       );
     });
     
+    console.log("Selected elements:", selected);
     const selectedIds = selected.map(el => el.id);
     setSelectedElementIds(selectedIds);
     

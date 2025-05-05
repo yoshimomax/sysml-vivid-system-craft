@@ -31,7 +31,10 @@ export const ElementLayer: React.FC<ElementLayerProps> = ({
           element={element}
           isSelected={element.id === selectedElementId || selectedElementIds.includes(element.id)}
           onMouseDown={(e) => onElementMouseDown(e, element.id)}
-          onContextMenu={(e) => onElementContextMenu(e, element.id)}
+          onContextMenu={(e) => {
+            e.stopPropagation();
+            onElementContextMenu(e, element.id);
+          }}
         />
       ))}
     </div>
