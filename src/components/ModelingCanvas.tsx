@@ -31,9 +31,13 @@ const ModelingCanvas = ({
 }: ModelingCanvasProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   
+  // Make sure elements and relationships are arrays
+  const elementArray = Array.isArray(elements) ? elements : [];
+  const relationshipArray = Array.isArray(relationships) ? relationships : [];
+  
   // Use the element dragging hook
   const { isDragging, startDragging, handleDragging, stopDragging } = useElementDragging({
-    elements,
+    elements: elementArray,
     setElements
   });
   
@@ -48,8 +52,8 @@ const ModelingCanvas = ({
     handleCanvasMouseMove,
     resetRelationshipCreation
   } = useRelationshipCreation({
-    elements,
-    relationships,
+    elements: elementArray,
+    relationships: relationshipArray,
     setRelationships,
     setSelectedRelationship
   });
@@ -117,7 +121,10 @@ const ModelingCanvas = ({
 
   const handleElementDrop = (newElement: Element) => {
     console.log('Element dropped:', newElement);
-    setElements(prevElements => [...prevElements, newElement]);
+    setElements(prevElements => {
+      const elements = Array.isArray(prevElements) ? prevElements : [];
+      return [...elements, newElement];
+    });
     setSelectedElement(newElement);
   };
 
@@ -136,8 +143,8 @@ const ModelingCanvas = ({
       >
         <div className="absolute inset-0">
           <RelationshipRenderer
-            relationships={relationships}
-            elements={elements}
+            relationships={relationshipArray}
+            elements={elementArray}
             tempRelationship={{
               sourceId: relationshipSource,
               tempEndPoint,
@@ -148,7 +155,7 @@ const ModelingCanvas = ({
           />
           
           <ElementRenderer
-            elements={elements}
+            elements={elementArray}
             selectedElement={selectedElement}
             onElementMouseDown={handleElementMouseDown}
             onElementContextMenu={handleElementContextMenu}

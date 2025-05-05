@@ -14,9 +14,12 @@ export const ElementRenderer = ({
   onElementMouseDown,
   onElementContextMenu
 }: ElementRendererProps) => {
+  // Make sure elements is an array
+  const elementArray = Array.isArray(elements) ? elements : [];
+  
   return (
     <>
-      {elements.map((element) => (
+      {elementArray.map((element) => (
         <div
           key={element.id}
           className={`element-block absolute ${selectedElement?.id === element.id ? 'element-selected' : ''}`}

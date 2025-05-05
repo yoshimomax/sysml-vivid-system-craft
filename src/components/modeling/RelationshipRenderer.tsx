@@ -22,10 +22,14 @@ export const RelationshipRenderer = ({
   selectedRelationship,
   onRelationshipClick,
 }: RelationshipRendererProps) => {
+  // Make sure elements and relationships are arrays
+  const elementArray = Array.isArray(elements) ? elements : [];
+  const relationshipArray = Array.isArray(relationships) ? relationships : [];
+  
   // Get the path for drawing a relationship line
   const getRelationshipPath = (relationship: Relationship): string => {
-    const source = elements.find(el => el.id === relationship.sourceId);
-    const target = elements.find(el => el.id === relationship.targetId);
+    const source = elementArray.find(el => el.id === relationship.sourceId);
+    const target = elementArray.find(el => el.id === relationship.targetId);
     
     if (!source || !target) {
       console.error(`Source or target element not found for relationship ${relationship.id}`);
@@ -41,10 +45,10 @@ export const RelationshipRenderer = ({
   
   // Debug logging for relationships
   useEffect(() => {
-    if (relationships.length > 0) {
-      console.log(`Rendering ${relationships.length} relationships`);
+    if (relationshipArray.length > 0) {
+      console.log(`Rendering ${relationshipArray.length} relationships`);
     }
-  }, [relationships]);
+  }, [relationshipArray]);
   
   // Get the marker end type based on relationship type
   const getMarkerEnd = (type: RelationshipType): string => {
@@ -64,7 +68,7 @@ export const RelationshipRenderer = ({
   
   // Helper to get element center
   const getElementCenter = (elementId: string): Position => {
-    const element = elements.find(el => el.id === elementId);
+    const element = elementArray.find(el => el.id === elementId);
     if (!element) return { x: 0, y: 0 };
     
     return {
@@ -114,7 +118,7 @@ export const RelationshipRenderer = ({
       
       {/* Actual relationships - important to set pointer-events to stroke */}
       <g className="relationships-group">
-        {relationships.map(relationship => (
+        {relationshipArray.map(relationship => (
           <path
             key={relationship.id}
             d={getRelationshipPath(relationship)}

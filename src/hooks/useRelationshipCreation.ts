@@ -24,6 +24,10 @@ export const useRelationshipCreation = ({
   const [tempEndPoint, setTempEndPoint] = useState<Position | null>(null);
   const { toast } = useToast();
 
+  // Make sure elements and relationships are arrays
+  const elementArray = Array.isArray(elements) ? elements : [];
+  const relationshipArray = Array.isArray(relationships) ? relationships : [];
+
   // Start creating a relationship from an element
   const startRelationship = (elementId: string, type: RelationshipType) => {
     console.log(`Starting relationship from element: ${elementId}`);
@@ -35,8 +39,8 @@ export const useRelationshipCreation = ({
   // Create a relationship between two elements
   const createRelationship = (sourceId: string, targetId: string) => {
     console.log(`Creating relationship: ${sourceId} -> ${targetId}`);
-    const sourceElement = elements.find(el => el.id === sourceId);
-    const targetElement = elements.find(el => el.id === targetId);
+    const sourceElement = elementArray.find(el => el.id === sourceId);
+    const targetElement = elementArray.find(el => el.id === targetId);
     
     if (!sourceElement || !targetElement) {
       console.error("Source or target element not found");
@@ -56,7 +60,7 @@ export const useRelationshipCreation = ({
     };
     
     console.log("New relationship:", newRelationship);
-    setRelationships([...relationships, newRelationship]);
+    setRelationships([...relationshipArray, newRelationship]);
     setSelectedRelationship(newRelationship);
     
     toast({

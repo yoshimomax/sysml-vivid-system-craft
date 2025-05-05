@@ -39,8 +39,11 @@ export const useElementDragging = ({
     const mouseX = e.clientX - canvasRect.left;
     const mouseY = e.clientY - canvasRect.top;
     
+    // Ensure elements is an array
+    const elementArray = Array.isArray(elements) ? elements : [];
+    
     // Update element position
-    setElements(elements.map(el => {
+    setElements(elementArray.map(el => {
       if (el.id === selectedElementId) {
         return {
           ...el,
