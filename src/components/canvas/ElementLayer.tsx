@@ -17,6 +17,7 @@ export const ElementLayer: React.FC<ElementLayerProps> = ({
   const activeDiagram = useModelingStore(state => state.getActiveDiagram());
   const elements = activeDiagram?.elements || [];
   const selectedElementId = useModelingStore(state => state.selectedElementId);
+  const selectedElementIds = useModelingStore(state => state.selectedElementIds);
   
   if (elements.length === 0) {
     return null;
@@ -28,7 +29,7 @@ export const ElementLayer: React.FC<ElementLayerProps> = ({
         <ElementRenderer
           key={element.id}
           element={element}
-          isSelected={element.id === selectedElementId}
+          isSelected={element.id === selectedElementId || selectedElementIds.includes(element.id)}
           onMouseDown={(e) => onElementMouseDown(e, element.id)}
           onContextMenu={(e) => onElementContextMenu(e, element.id)}
         />

@@ -1,3 +1,4 @@
+
 import { Element, Relationship, Position, ElementType, Size } from "../model/types";
 import { v4 as uuidv4 } from "uuid";
 import { useModelingStore } from "../store";
@@ -196,66 +197,30 @@ export class DiagramEngine {
     switch (direction) {
       case 'left': {
         targetValue = Math.min(...elements.map(el => el.position.x));
-        const updatedElements = elements.map(el => ({
-          ...el,
-          position: { ...el.position, x: targetValue }
-        }));
         break;
       }
       case 'center': {
         const centers = elements.map(el => el.position.x + el.size.width / 2);
         targetValue = centers.reduce((sum, val) => sum + val, 0) / centers.length;
-        const updatedElements = elements.map(el => ({
-          ...el,
-          position: { 
-            ...el.position, 
-            x: targetValue - el.size.width / 2 
-          }
-        }));
         break;
       }
       case 'right': {
         const rights = elements.map(el => el.position.x + el.size.width);
         targetValue = Math.max(...rights);
-        const updatedElements = elements.map(el => ({
-          ...el,
-          position: { 
-            ...el.position, 
-            x: targetValue - el.size.width 
-          }
-        }));
         break;
       }
       case 'top': {
         targetValue = Math.min(...elements.map(el => el.position.y));
-        const updatedElements = elements.map(el => ({
-          ...el,
-          position: { ...el.position, y: targetValue }
-        }));
         break;
       }
       case 'middle': {
         const middles = elements.map(el => el.position.y + el.size.height / 2);
         targetValue = middles.reduce((sum, val) => sum + val, 0) / middles.length;
-        const updatedElements = elements.map(el => ({
-          ...el,
-          position: { 
-            ...el.position, 
-            y: targetValue - el.size.height / 2 
-          }
-        }));
         break;
       }
       case 'bottom': {
         const bottoms = elements.map(el => el.position.y + el.size.height);
         targetValue = Math.max(...bottoms);
-        const updatedElements = elements.map(el => ({
-          ...el,
-          position: { 
-            ...el.position, 
-            y: targetValue - el.size.height 
-          }
-        }));
         break;
       }
     }

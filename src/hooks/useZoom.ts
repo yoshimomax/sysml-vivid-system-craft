@@ -1,5 +1,5 @@
 
-import { useState, useCallback, RefObject } from "react";
+import { useState, useCallback } from "react";
 
 interface UseZoomProps {
   minScale?: number;

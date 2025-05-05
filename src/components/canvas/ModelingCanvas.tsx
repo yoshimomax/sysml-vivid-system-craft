@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import { useModelingStore, DiagramEventsExtended } from "../../store/modelingStore";
 import { diagramEngine } from "../../core/DiagramEngine";
@@ -159,13 +160,15 @@ export const ModelingCanvas: React.FC = () => {
     }
   };
   
-  // Mouse up handler
+  // Mouse up handler - handles both dragging and selection
   const handleMouseUp = (e: React.MouseEvent) => {
+    // First check if we are selecting
     if (isSelecting) {
       endSelection();
       return;
     }
     
+    // Then check if we are dragging
     handleDragEnd();
   };
   

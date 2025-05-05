@@ -17,6 +17,56 @@ export const createRelationshipSlice: StateCreator<
   relationshipType: null,
   
   // Actions
+  startCreatingRelationship: (sourceId, type) => {
+    set({
+      isCreatingRelationship: true,
+      relationshipSourceId: sourceId,
+      relationshipType: type
+    });
+  },
+  
+  cancelCreatingRelationship: () => {
+    set({
+      isCreatingRelationship: false,
+      relationshipSourceId: null,
+      relationshipType: null
+    });
+  },
+  
+  completeRelationship: (targetId) => {
+    const { relationshipSourceId, relationshipType, getActiveDiagram } = get();
+    
+    if (!relationshipSourceId || !relationshipType || relationshipSourceId === targetId) {
+      // Cannot create relationship to self or without source/type
+      set({
+        isCreatingRelationship: false,
+        relationshipSourceId: null,
+        relationshipType: null
+      });
+      return;
+    }
+    
+    const relationship = {
+      id: uuidv4(),
+      type: relationshipType,
+      sourceId: relationshipSourceId,
+      targetId,
+      name: `${relationshipType} Relationship`
+    };
+    
+    // Add relationship to current diagram
+    get().addRelationship(relationship);
+    
+    // Reset relationship creation state
+    set({
+      isCreatingRelationship: false,
+      relationshipSourceId: null,
+      relationshipType: null
+    });
+    
+    eventBus.publish(DiagramEventsExtended.RELATIONSHIP_CREATED, relationship);
+  },
+  
   addRelationship: (relationship) => {
     const diagram = get().getActiveDiagram();
     if (!diagram) return;
@@ -37,9 +87,7 @@ export const createRelationshipSlice: StateCreator<
           ...state.project,
           diagrams: updatedDiagrams
         },
-        selectedRelationshipId: relationship.id,
-        selectedElementId: null,
-        selectedElementIds: []
+        selectedRelationshipId: relationship.id
       };
     });
     
@@ -57,9 +105,9 @@ export const createRelationshipSlice: StateCreator<
             ...d,
             relationships: d.relationships.map(rel => {
               if (rel.id === id) {
-                const updatedRel = { ...rel, ...updates };
-                eventBus.publish(DiagramEventsExtended.RELATIONSHIP_UPDATED, updatedRel);
-                return updatedRel;
+                const updatedRelationship = { ...rel, ...updates };
+                eventBus.publish(DiagramEventsExtended.RELATIONSHIP_UPDATED, updatedRelationship);
+                return updatedRelationship;
               }
               return rel;
             })
@@ -102,38 +150,5 @@ export const createRelationshipSlice: StateCreator<
     });
     
     eventBus.publish(DiagramEventsExtended.RELATIONSHIP_REMOVED, id);
-  },
-  
-  // Relationship creation
-  startCreatingRelationship: (sourceId, type) => {
-    set({ 
-      isCreatingRelationship: true, 
-      relationshipSourceId: sourceId, 
-      relationshipType: type 
-    });
-  },
-  
-  cancelCreatingRelationship: () => {
-    set({ 
-      isCreatingRelationship: false, 
-      relationshipSourceId: null, 
-      relationshipType: null 
-    });
-  },
-  
-  completeRelationship: (targetId) => {
-    const { relationshipSourceId, relationshipType } = get();
-    if (!relationshipSourceId || !relationshipType) return;
-    
-    const newRelationship = {
-      id: uuidv4(),
-      type: relationshipType as any,
-      name: `${relationshipType} Relationship`,
-      sourceId: relationshipSourceId,
-      targetId
-    };
-    
-    get().addRelationship(newRelationship);
-    get().cancelCreatingRelationship();
   }
 });
