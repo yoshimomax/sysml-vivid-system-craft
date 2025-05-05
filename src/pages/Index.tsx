@@ -17,6 +17,10 @@ const Index = () => {
   const selectDiagram = useModelingStore(state => state.selectDiagram);
   const addDiagram = useModelingStore(state => state.addDiagram);
   const removeDiagram = useModelingStore(state => state.removeDiagram);
+  const selectedElement = useModelingStore(state => state.getSelectedElement());
+  const selectedRelationship = useModelingStore(state => state.getSelectedRelationship());
+  const updateElement = useModelingStore(state => state.updateElement);
+  const updateRelationship = useModelingStore(state => state.updateRelationship);
   
   // Initialize active diagram if not set
   useEffect(() => {
@@ -53,6 +57,15 @@ const Index = () => {
     });
   };
 
+  // Handlers for updating elements and relationships
+  const handleElementUpdate = (element: any) => {
+    updateElement(element.id, element);
+  };
+
+  const handleRelationshipUpdate = (relationship: any) => {
+    updateRelationship(relationship.id, relationship);
+  };
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <ModelingHeader />
@@ -78,7 +91,12 @@ const Index = () => {
         
         {/* Properties Panel (Right Sidebar) */}
         <div className="w-72 border-l border-border bg-card overflow-y-auto">
-          <PropertiesPanel />
+          <PropertiesPanel 
+            selectedElement={selectedElement}
+            selectedRelationship={selectedRelationship}
+            onElementUpdate={handleElementUpdate}
+            onRelationshipUpdate={handleRelationshipUpdate}
+          />
         </div>
       </div>
     </div>

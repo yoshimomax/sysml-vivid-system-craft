@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { useModelingStore } from "../../store/modelingStore";
 import { diagramEngine } from "../../core/DiagramEngine";
@@ -27,7 +28,7 @@ export const ModelingCanvas: React.FC = () => {
     relationshipSourceId,
     relationshipType,
     startRelationship,
-    handleMouseMove,
+    handleMouseMove: handleRelationshipMouseMove, // Renamed to avoid duplicate declaration
     cancelRelationshipCreation
   } = useRelationshipCreation();
   
@@ -58,10 +59,11 @@ export const ModelingCanvas: React.FC = () => {
     diagramEngine.selectRelationship(relationshipId);
   };
   
+  // Combined mouse move handler for all interactions
   const handleMouseMove = (e: React.MouseEvent) => {
     // Handle relationship creation mouse move
     if (isCreatingRelationship) {
-      handleMouseMove(e, canvasRef);
+      handleRelationshipMouseMove(e, canvasRef);
       return;
     }
     

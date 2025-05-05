@@ -43,22 +43,17 @@ const ModelingCanvas = ({
     setElements
   });
   
-  // Use the relationship creation hook
+  // Use the relationship creation hook - we'll adapt to its interface
   const { 
     isCreatingRelationship,
-    relationshipSource,
+    relationshipSourceId,  // Changed from relationshipSource
     relationshipType,
     tempEndPoint,
     startRelationship,
-    createRelationship,
-    handleCanvasMouseMove,
-    resetRelationshipCreation
-  } = useRelationshipCreation({
-    elements: elementArray,
-    relationships: relationshipArray,
-    setRelationships,
-    setSelectedRelationship
-  });
+    handleMouseMove: handleRelationshipMouseMove, // Use the hook's handleMouseMove
+    cancelRelationshipCreation, // Use instead of resetRelationshipCreation
+    completeRelationship  // Use instead of createRelationship
+  } = useRelationshipCreation();
 
   useEffect(() => {
     console.log("Elements in ModelingCanvas updated:", elementArray);
@@ -71,9 +66,8 @@ const ModelingCanvas = ({
     if (isCreatingRelationship) {
       e.preventDefault();
       // If we already have a source, this is the target
-      if (relationshipSource && relationshipSource !== element.id) {
-        createRelationship(relationshipSource, element.id);
-        resetRelationshipCreation();
+      if (relationshipSourceId) {  // Changed from relationshipSource
+        completeRelationship(element.id);  // Changed from createRelationship
       }
       return;
     }
@@ -86,7 +80,7 @@ const ModelingCanvas = ({
   const handleCanvasClick = (e: React.MouseEvent) => {
     // If we're creating a relationship but clicked on the canvas, cancel the operation
     if (isCreatingRelationship && e.target === canvasRef.current) {
-      resetRelationshipCreation();
+      cancelRelationshipCreation();  // Changed from resetRelationshipCreation
       return;
     }
     
@@ -115,7 +109,7 @@ const ModelingCanvas = ({
   const handleMouseMove = (e: React.MouseEvent) => {
     // Handle relationship creation mouse move
     if (isCreatingRelationship) {
-      handleCanvasMouseMove(e, canvasRef);
+      handleRelationshipMouseMove(e, canvasRef);  // Changed from handleCanvasMouseMove
       return;
     }
     
@@ -154,9 +148,9 @@ const ModelingCanvas = ({
             relationships={relationshipArray}
             elements={elementArray}
             tempRelationship={{
-              sourceId: relationshipSource,
+              sourceId: relationshipSourceId,  // Changed from relationshipSource
               tempEndPoint,
-              type: relationshipType
+              type: relationshipType as any  // Added type assertion to fix RelationshipType error
             }}
             selectedRelationship={selectedRelationship}
             onRelationshipClick={handleRelationshipClick}
