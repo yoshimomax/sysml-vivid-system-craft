@@ -1,0 +1,126 @@
+
+/* Element styles */
+.element-block {
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.element-block .header {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  padding: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.element-block .content {
+  padding: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.element-selected {
+  box-shadow: 0 0 0 2px var(--primary), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Element type-specific styles */
+.element-block[data-type="Requirement"] .header {
+  background-color: #f0e6ff;
+  color: #7c5cff;
+}
+
+.element-block[data-type="Part"] .header {
+  background-color: #e6f2ff;
+  color: #3a86ff;
+}
+
+.element-block[data-type="Action"] .header {
+  background-color: #e6fff0;
+  color: #38b000;
+}
+
+.element-block[data-type="State"] .header {
+  background-color: #fff3e6;
+  color: #ff8600;
+}
+
+.element-block[data-type="InterfaceDefinition"] .header {
+  background-color: #f2e6ff;
+  color: #9d4edd;
+}
+
+/* Relationship styles */
+.relationship-path {
+  cursor: pointer;
+  stroke: var(--foreground);
+  transition: stroke-width 0.2s ease;
+}
+
+.relationship-path:hover {
+  stroke-width: 2px;
+}
+
+.relationship-path-selected {
+  stroke: var(--primary);
+  stroke-width: 2.5px;
+}
+
+.relationship-path-temp {
+  pointer-events: none;
+}
+
+/* Handles for elements */
+.element-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border: 1px solid white;
+  border-radius: 50%;
+}
+
+.element-handle.n {
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.element-handle.e {
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.element-handle.s {
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.element-handle.w {
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Canvas grid */
+.canvas-wrapper {
+  background-color: var(--background);
+  background-image: 
+    linear-gradient(to right, rgba(150, 150, 150, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(150, 150, 150, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Sidebar styling */
+.sidebar-group-title {
+  background-color: var(--muted);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Element, Position, ElementType, Size, Relationship, RelationshipType } from "@/types/sysml";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/components/ui/use-toast";
+import "../styles/modeling.css";
 
 interface ModelingCanvasProps {
   elements: Element[];
@@ -291,6 +292,7 @@ const ModelingCanvas = ({
           width: `${element.size.width}px`,
           height: `${element.size.height}px`,
         }}
+        data-type={element.type}
         onMouseDown={(e) => handleElementMouseDown(e, element)}
         onContextMenu={(e) => handleElementContextMenu(e, element)}
       >

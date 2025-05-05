@@ -6,6 +6,11 @@ import GeneralProperties from "./properties/GeneralProperties";
 import PositionSizeProperties from "./properties/PositionSizeProperties";
 import RequirementProperties from "./properties/RequirementProperties";
 import RelationshipProperties from "./properties/RelationshipProperties";
+import PartProperties from "./properties/PartProperties";
+import ActionProperties from "./properties/ActionProperties";
+import InterfaceProperties from "./properties/InterfaceProperties";
+import ClassProperties from "./properties/ClassProperties";
+import StateProperties from "./properties/StateProperties";
 
 interface PropertiesPanelProps {
   selectedElement: Element | null;
@@ -103,9 +108,49 @@ const PropertiesPanel = ({
         <PositionSizeProperties element={selectedElement!} />
       </PropertyGroup>
 
+      {/* Render specialized property editors based on element type */}
       {selectedElement!.type === "Part" && (
         <PropertyGroup title="Part Specific">
-          <p className="text-xs text-muted-foreground">Additional part properties will appear here</p>
+          <PartProperties 
+            element={selectedElement!} 
+            onPropertyChange={handlePropertiesChange} 
+          />
+        </PropertyGroup>
+      )}
+
+      {selectedElement!.type === "Action" && (
+        <PropertyGroup title="Action Specific">
+          <ActionProperties 
+            element={selectedElement!} 
+            onPropertyChange={handlePropertiesChange} 
+          />
+        </PropertyGroup>
+      )}
+
+      {selectedElement!.type === "InterfaceDefinition" && (
+        <PropertyGroup title="Interface Specific">
+          <InterfaceProperties 
+            element={selectedElement!} 
+            onPropertyChange={handlePropertiesChange} 
+          />
+        </PropertyGroup>
+      )}
+
+      {selectedElement!.type === "State" && (
+        <PropertyGroup title="State Specific">
+          <StateProperties 
+            element={selectedElement!} 
+            onPropertyChange={handlePropertiesChange} 
+          />
+        </PropertyGroup>
+      )}
+
+      {(selectedElement!.type === "Class" || selectedElement!.type === "Type") && (
+        <PropertyGroup title="Class Specific">
+          <ClassProperties 
+            element={selectedElement!} 
+            onPropertyChange={handlePropertiesChange} 
+          />
         </PropertyGroup>
       )}
 
