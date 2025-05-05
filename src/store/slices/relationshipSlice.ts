@@ -3,6 +3,7 @@ import { StateCreator } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { ModelingState, RelationshipState } from '../types/storeTypes';
 import { eventBus, DiagramEventsExtended } from '../../core/EventBus';
+import { RelationshipType } from '../../model/types';
 
 // Relationship state slice
 export const createRelationshipSlice: StateCreator<
@@ -48,7 +49,7 @@ export const createRelationshipSlice: StateCreator<
     
     const relationship = {
       id: uuidv4(),
-      type: relationshipType,
+      type: relationshipType as RelationshipType, // Cast to RelationshipType
       sourceId: relationshipSourceId,
       targetId,
       name: `${relationshipType} Relationship`
@@ -64,7 +65,7 @@ export const createRelationshipSlice: StateCreator<
       relationshipType: null
     });
     
-    eventBus.publish(DiagramEventsExtended.RELATIONSHIP_CREATED, relationship);
+    eventBus.publish(DiagramEventsExtended.RELATIONSHIP_ADDED, relationship);
   },
   
   addRelationship: (relationship) => {
