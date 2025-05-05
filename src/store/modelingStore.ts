@@ -1,7 +1,8 @@
+
 import { create } from 'zustand';
 import { Diagram, Element, Project, Relationship } from '../model/types';
 import { v4 as uuidv4 } from 'uuid';
-import { eventBus, DiagramEvents } from '../core/EventBus';
+import { eventBus, DiagramEvents as CoreDiagramEvents } from '../core/EventBus';
 
 // Store state interface
 interface ModelingState {
@@ -114,7 +115,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
   // Diagram actions
   selectDiagram: (id) => {
     set({ activeDiagramId: id, selectedElementId: null, selectedRelationshipId: null });
-    eventBus.publish(DiagramEvents.DIAGRAM_CHANGED, id);
+    eventBus.publish(CoreDiagramEvents.DIAGRAM_CHANGED, id);
   },
   
   addDiagram: (name, type) => {
@@ -134,7 +135,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
       activeDiagramId: newDiagram.id
     }));
     
-    eventBus.publish(DiagramEvents.DIAGRAM_CHANGED, newDiagram.id);
+    eventBus.publish(CoreDiagramEvents.DIAGRAM_CHANGED, newDiagram.id);
   },
   
   removeDiagram: (id) => {
@@ -158,7 +159,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
       selectedRelationshipId: null
     }));
     
-    eventBus.publish(DiagramEvents.DIAGRAM_CHANGED, newActiveId);
+    eventBus.publish(CoreDiagramEvents.DIAGRAM_CHANGED, newActiveId);
   },
   
   // Element actions
@@ -168,7 +169,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
       selectedElementIds: id ? [id] : [], // Update the array too
       selectedRelationshipId: null 
     });
-    eventBus.publish(DiagramEvents.ELEMENT_SELECTED, id);
+    eventBus.publish(CoreDiagramEvents.ELEMENT_SELECTED, id);
   },
   
   selectMultipleElements: (ids) => {
@@ -177,7 +178,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
       selectedElementId: ids.length === 1 ? ids[0] : null,
       selectedRelationshipId: null
     });
-    eventBus.publish(DiagramEvents.MULTIPLE_ELEMENTS_SELECTED, ids);
+    eventBus.publish(DiagramEventsExtended.MULTIPLE_ELEMENTS_SELECTED, ids);
   },
   
   addElement: (element) => {
@@ -201,11 +202,12 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
           diagrams: updatedDiagrams
         },
         selectedElementId: element.id,
+        selectedElementIds: [element.id],
         selectedRelationshipId: null
       };
     });
     
-    eventBus.publish(DiagramEvents.ELEMENT_ADDED, element);
+    eventBus.publish(CoreDiagramEvents.ELEMENT_ADDED, element);
   },
   
   updateElement: (id, updates) => {
@@ -220,7 +222,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
             elements: d.elements.map(el => {
               if (el.id === id) {
                 const updatedElement = { ...el, ...updates };
-                eventBus.publish(DiagramEvents.ELEMENT_UPDATED, updatedElement);
+                eventBus.publish(CoreDiagramEvents.ELEMENT_UPDATED, updatedElement);
                 return updatedElement;
               }
               return el;
@@ -268,19 +270,23 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
           diagrams: updatedDiagrams
         },
         selectedElementId: state.selectedElementId === id ? null : state.selectedElementId,
+        selectedElementIds: state.selectedElementIds.includes(id) 
+          ? state.selectedElementIds.filter(elId => elId !== id) 
+          : state.selectedElementIds
       };
     });
     
-    eventBus.publish(DiagramEvents.ELEMENT_REMOVED, id);
+    eventBus.publish(CoreDiagramEvents.ELEMENT_REMOVED, id);
   },
   
   // Relationship actions
   selectRelationship: (id) => {
     set({ 
       selectedRelationshipId: id, 
-      selectedElementId: null 
+      selectedElementId: null,
+      selectedElementIds: []
     });
-    eventBus.publish(DiagramEvents.RELATIONSHIP_SELECTED, id);
+    eventBus.publish(CoreDiagramEvents.RELATIONSHIP_SELECTED, id);
   },
   
   addRelationship: (relationship) => {
@@ -304,11 +310,12 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
           diagrams: updatedDiagrams
         },
         selectedRelationshipId: relationship.id,
-        selectedElementId: null
+        selectedElementId: null,
+        selectedElementIds: []
       };
     });
     
-    eventBus.publish(DiagramEvents.RELATIONSHIP_ADDED, relationship);
+    eventBus.publish(CoreDiagramEvents.RELATIONSHIP_ADDED, relationship);
   },
   
   updateRelationship: (id, updates) => {
@@ -323,7 +330,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
             relationships: d.relationships.map(rel => {
               if (rel.id === id) {
                 const updatedRel = { ...rel, ...updates };
-                eventBus.publish(DiagramEvents.RELATIONSHIP_UPDATED, updatedRel);
+                eventBus.publish(CoreDiagramEvents.RELATIONSHIP_UPDATED, updatedRel);
                 return updatedRel;
               }
               return rel;
@@ -366,7 +373,7 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
       };
     });
     
-    eventBus.publish(DiagramEvents.RELATIONSHIP_REMOVED, id);
+    eventBus.publish(CoreDiagramEvents.RELATIONSHIP_REMOVED, id);
   },
   
   // Relationship creation
@@ -404,7 +411,10 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
   
   // Dragging state
   startDragging: () => set({ isDragging: true }),
-  stopDragging: () => set({ isDragging: false })
+  stopDragging: () => set({ isDragging: false }),
+  
+  // Zoom actions
+  setScale: (scale) => set({ scale })
 }));
 
 // Initialize the active diagram ID
@@ -412,8 +422,8 @@ useModelingStore.setState(state => ({
   activeDiagramId: state.project.diagrams[0].id
 }));
 
-// Add new event type for multiple selection
-export const DiagramEvents = {
-  ...DiagramEvents, // Keep existing events
+// Define extended diagram events separately to avoid conflicts
+export const DiagramEventsExtended = {
+  ...CoreDiagramEvents,
   MULTIPLE_ELEMENTS_SELECTED: 'elements:selected'
 };

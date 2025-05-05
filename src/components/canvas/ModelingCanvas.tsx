@@ -1,6 +1,5 @@
-
 import React, { useRef, useState } from "react";
-import { useModelingStore } from "../../store/modelingStore";
+import { useModelingStore, DiagramEventsExtended } from "../../store/modelingStore";
 import { diagramEngine } from "../../core/DiagramEngine";
 import { GridLayer } from "./GridLayer";
 import { ElementLayer } from "./ElementLayer";

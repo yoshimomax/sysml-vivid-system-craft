@@ -1,7 +1,14 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { AlignCenter, AlignHorizontally, AlignLeft, AlignRight, AlignVertically, Trash2 } from "lucide-react";
+import { 
+  AlignCenter, 
+  AlignStartHorizontal, 
+  AlignLeft, 
+  AlignRight, 
+  AlignStartVertical, 
+  Trash2 
+} from "lucide-react";
 
 interface SelectionActionPanelProps {
   selectedIds: string[];
@@ -39,7 +46,7 @@ export const SelectionActionPanel: React.FC<SelectionActionPanelProps> = ({
           onClick={() => onAlign('center')}
           title="Align Center"
         >
-          <AlignHorizontally className="h-4 w-4" />
+          <AlignStartHorizontal className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
@@ -69,7 +76,7 @@ export const SelectionActionPanel: React.FC<SelectionActionPanelProps> = ({
           onClick={() => onAlign('middle')}
           title="Align Middle"
         >
-          <AlignVertically className="h-4 w-4" />
+          <AlignStartVertical className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"

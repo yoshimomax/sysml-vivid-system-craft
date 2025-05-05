@@ -1,7 +1,6 @@
 
 import React from "react";
 import { RelationshipType } from "../../model/types";
-import { Menu } from "@/components/ui/menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 
