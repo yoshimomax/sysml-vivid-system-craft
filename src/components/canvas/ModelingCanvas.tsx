@@ -47,6 +47,7 @@ export const ModelingCanvas: React.FC = () => {
   // Canvas interactions hook
   const {
     contextMenuPosition,
+    setContextMenuPosition, // Get this function from the hook
     elementForContextMenu,
     isSelecting,
     selectionBox,
@@ -107,7 +108,7 @@ export const ModelingCanvas: React.FC = () => {
           contextMenuPosition={contextMenuPosition}
           elementForContextMenu={elementForContextMenu}
           onSelectRelationshipType={handleRelationshipTypeSelect}
-          onCancel={() => contextMenuPosition && setContextMenuPosition(null)}
+          onCancel={() => setContextMenuPosition(null)}
         />
         
         <DropLayer canvasRef={canvasRef}>
