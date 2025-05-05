@@ -1,5 +1,5 @@
-
 import { Element, Position, Relationship, RelationshipType } from "@/types/sysml";
+import { calculateConnectionPoints } from "@/utils/elementUtils";
 
 interface RelationshipRendererProps {
   relationships: Relationship[];
@@ -27,19 +27,11 @@ export const RelationshipRenderer = ({
     
     if (!source || !target) return "";
     
-    // Calculate source and target centers
-    const sourceCenter = {
-      x: source.position.x + source.size.width / 2,
-      y: source.position.y + source.size.height / 2
-    };
+    // Calculate connection points
+    const points = calculateConnectionPoints(source, target);
     
-    const targetCenter = {
-      x: target.position.x + target.size.width / 2,
-      y: target.position.y + target.size.height / 2
-    };
-    
-    // For now, just draw a straight line between centers
-    return `M ${sourceCenter.x} ${sourceCenter.y} L ${targetCenter.x} ${targetCenter.y}`;
+    // Draw path from source to target connection points
+    return `M ${points.source.x} ${points.source.y} L ${points.target.x} ${points.target.y}`;
   };
   
   // Get the marker end type based on relationship type
@@ -118,6 +110,7 @@ export const RelationshipRenderer = ({
           strokeWidth="1.5"
           fill="none"
           markerEnd={getMarkerEnd(relationship.type)}
+          style={{ pointerEvents: 'stroke' }} // Enable click events on the path
           onClick={(e) => onRelationshipClick(e, relationship)}
         />
       ))}
@@ -132,6 +125,7 @@ export const RelationshipRenderer = ({
           strokeDasharray="5,5"
           fill="none"
           markerEnd={getMarkerEnd(tempRelationship.type)}
+          style={{ pointerEvents: 'none' }}
         />
       )}
     </svg>

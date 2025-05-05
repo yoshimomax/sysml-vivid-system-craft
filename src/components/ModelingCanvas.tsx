@@ -1,11 +1,10 @@
-
 import { useState, useRef } from "react";
 import { Element, Position, ElementType, Relationship, RelationshipType } from "@/types/sysml";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/components/ui/use-toast";
 import { ElementRenderer } from "./modeling/ElementRenderer";
 import { RelationshipRenderer } from "./modeling/RelationshipRenderer";
-import { getDefaultSizeForType, calculateConnectionPoint } from "@/utils/elementUtils";
+import { getDefaultSizeForType, calculateConnectionPoints } from "@/utils/elementUtils";
 import "../styles/modeling.css";
 
 interface ModelingCanvasProps {
@@ -72,6 +71,7 @@ const ModelingCanvas = ({
 
   const handleElementMouseDown = (e: React.MouseEvent, element: Element) => {
     e.stopPropagation();
+    
     // If we're creating a relationship
     if (isCreatingRelationship) {
       e.preventDefault();
@@ -86,6 +86,7 @@ const ModelingCanvas = ({
     }
     
     setSelectedElement(element);
+    setSelectedRelationship(null); // 要素を選択したらリレーションシップの選択を解除
     setIsDragging(true);
     
     // Calculate offset from element position to mouse position
@@ -169,30 +170,42 @@ const ModelingCanvas = ({
   
   // Start creating a relationship from an element
   const startRelationship = (elementId: string, type: RelationshipType) => {
+    console.log(`Starting relationship from element: ${elementId}`);
     setIsCreatingRelationship(true);
     setRelationshipSource(elementId);
     setRelationshipType(type);
+    
+    // リレーションシップ作成中は選択解除して視覚的に分かりやすくする
+    setSelectedElement(null);
+    setSelectedRelationship(null);
   };
   
   // Create a relationship between two elements
   const createRelationship = (sourceId: string, targetId: string) => {
+    console.log(`Creating relationship: ${sourceId} -> ${targetId}`);
     const sourceElement = elements.find(el => el.id === sourceId);
     const targetElement = elements.find(el => el.id === targetId);
     
-    if (!sourceElement || !targetElement) return;
+    if (!sourceElement || !targetElement) {
+      console.error("Source or target element not found");
+      return;
+    }
+    
+    // Calculate connection points
+    const points = calculateConnectionPoints(sourceElement, targetElement);
     
     const newRelationship: Relationship = {
       id: uuidv4(),
       type: relationshipType,
       sourceId,
       targetId,
-      points: [
-        calculateConnectionPoint(sourceElement, targetElement),
-        calculateConnectionPoint(targetElement, sourceElement)
-      ]
+      name: `${relationshipType} Relationship`,
+      points: [points.source, points.target]
     };
     
+    console.log("New relationship:", newRelationship);
     setRelationships([...relationships, newRelationship]);
+    setSelectedRelationship(newRelationship);
     
     toast({
       title: "Relationship created",
@@ -203,12 +216,14 @@ const ModelingCanvas = ({
   // Handle element context menu for relationship creation
   const handleElementContextMenu = (e: React.MouseEvent, element: Element) => {
     e.preventDefault();
+    console.log(`Right-clicked on element: ${element.id}`);
     startRelationship(element.id, "Dependency");
   };
 
   // Handle relationship click
   const handleRelationshipClick = (e: React.MouseEvent, relationship: Relationship) => {
     e.stopPropagation();
+    console.log(`Clicked on relationship: ${relationship.id}`);
     setSelectedElement(null);
     setSelectedRelationship(relationship);
   };

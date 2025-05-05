@@ -28,7 +28,10 @@ export const ElementRenderer = ({
           }}
           data-type={element.type}
           onMouseDown={(e) => onElementMouseDown(e, element)}
-          onContextMenu={(e) => onElementContextMenu(e, element)}
+          onContextMenu={(e) => {
+            e.preventDefault(); // 重要: 右クリックのデフォルト動作を防止
+            onElementContextMenu(e, element);
+          }}
         >
           <div className="header">
             {element.stereotype && <div className="text-xs text-muted-foreground">{`<<${element.stereotype}>>`}</div>}
