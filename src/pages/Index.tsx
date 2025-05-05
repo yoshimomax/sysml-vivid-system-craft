@@ -18,6 +18,7 @@ const Index = () => {
   const addDiagram = useModelingStore(state => state.addDiagram);
   const removeDiagram = useModelingStore(state => state.removeDiagram);
   const selectedElement = useModelingStore(state => state.getSelectedElement());
+  const selectedElements = useModelingStore(state => state.getSelectedElements());
   const selectedRelationship = useModelingStore(state => state.getSelectedRelationship());
   const updateElement = useModelingStore(state => state.updateElement);
   const updateRelationship = useModelingStore(state => state.updateRelationship);

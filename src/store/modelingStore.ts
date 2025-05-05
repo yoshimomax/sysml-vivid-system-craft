@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { Diagram, Element, Project, Relationship } from '../model/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +9,7 @@ interface ModelingState {
   project: Project;
   activeDiagramId: string;
   selectedElementId: string | null;
+  selectedElementIds: string[]; // New: Multiple selection support
   selectedRelationshipId: string | null;
   
   // UI State
@@ -17,10 +17,12 @@ interface ModelingState {
   relationshipSourceId: string | null;
   relationshipType: string | null;
   isDragging: boolean;
+  scale: number; // New: Zoom scale
   
   // Getters
   getActiveDiagram: () => Diagram | undefined;
   getSelectedElement: () => Element | null;
+  getSelectedElements: () => Element[]; // New: Get multiple selected elements
   getSelectedRelationship: () => Relationship | null;
   
   // Actions
@@ -29,6 +31,7 @@ interface ModelingState {
   removeDiagram: (id: string) => void;
   
   selectElement: (id: string | null) => void;
+  selectMultipleElements: (ids: string[]) => void; // New: Select multiple elements
   addElement: (element: Element) => void;
   updateElement: (id: string, updates: Partial<Element>) => void;
   removeElement: (id: string) => void;
@@ -44,6 +47,9 @@ interface ModelingState {
   
   startDragging: () => void;
   stopDragging: () => void;
+  
+  // Zoom actions
+  setScale: (scale: number) => void; // New: Set zoom scale
 }
 
 // Create the store
@@ -64,11 +70,13 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
   },
   activeDiagramId: '',
   selectedElementId: null,
+  selectedElementIds: [], // New: Initialize empty array
   selectedRelationshipId: null,
   isCreatingRelationship: false,
   relationshipSourceId: null,
   relationshipType: null,
   isDragging: false,
+  scale: 1, // New: Initial scale is 1
   
   // Initialize with first diagram
   getActiveDiagram: () => {
@@ -82,6 +90,17 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
     
     const diagram = getActiveDiagram();
     return diagram?.elements.find(e => e.id === selectedElementId) || null;
+  },
+  
+  // New: Get multiple selected elements
+  getSelectedElements: () => {
+    const { selectedElementIds, getActiveDiagram } = get();
+    if (selectedElementIds.length === 0) return [];
+    
+    const diagram = getActiveDiagram();
+    if (!diagram) return [];
+    
+    return diagram.elements.filter(e => selectedElementIds.includes(e.id));
   },
   
   getSelectedRelationship: () => {
@@ -146,9 +165,19 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
   selectElement: (id) => {
     set({ 
       selectedElementId: id, 
+      selectedElementIds: id ? [id] : [], // Update the array too
       selectedRelationshipId: null 
     });
     eventBus.publish(DiagramEvents.ELEMENT_SELECTED, id);
+  },
+  
+  selectMultipleElements: (ids) => {
+    set({ 
+      selectedElementIds: ids,
+      selectedElementId: ids.length === 1 ? ids[0] : null,
+      selectedRelationshipId: null
+    });
+    eventBus.publish(DiagramEvents.MULTIPLE_ELEMENTS_SELECTED, ids);
   },
   
   addElement: (element) => {
@@ -382,3 +411,9 @@ export const useModelingStore = create<ModelingState>((set, get) => ({
 useModelingStore.setState(state => ({
   activeDiagramId: state.project.diagrams[0].id
 }));
+
+// Add new event type for multiple selection
+export const DiagramEvents = {
+  ...DiagramEvents, // Keep existing events
+  MULTIPLE_ELEMENTS_SELECTED: 'elements:selected'
+};
