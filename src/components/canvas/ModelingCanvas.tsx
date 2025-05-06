@@ -10,6 +10,7 @@ import { MinimapPanel } from "./MinimapPanel";
 import { SelectionActionPanel } from "./SelectionActionPanel";
 import { ContextMenuManager } from "./ContextMenuManager";
 import { HelpTooltip } from "./HelpTooltip";
+import { SelectionBox } from "./SelectionBox";
 import "../../styles/modeling.css";
 
 export const ModelingCanvas: React.FC = () => {
@@ -80,7 +81,7 @@ export const ModelingCanvas: React.FC = () => {
     updateStoreSelection();
   }, [updateStoreSelection]);
   
-  console.log("ModelingCanvas render", {isSelecting, selectionBox, selectedElementIds});
+  console.log("ModelingCanvas render", {isSelecting, selectionBox, selectedElementIds, scale});
   
   return (
     <div className="flex h-full">
@@ -97,6 +98,15 @@ export const ModelingCanvas: React.FC = () => {
       >
         {/* Help tooltip */}
         <HelpTooltip visible={showHelp} />
+        
+        {/* Show selection box directly in canvas (outside of scaled content) */}
+        {isSelecting && selectionBox && (
+          <SelectionBox 
+            isSelecting={isSelecting} 
+            selectionBox={selectionBox}
+            scale={1} // Selection box is outside scaled content
+          />
+        )}
         
         {/* Multi-selection action panel */}
         {selectedElementIds.length > 1 && (

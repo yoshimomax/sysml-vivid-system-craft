@@ -32,15 +32,19 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   
   // Start selection process
   const startSelection = useCallback((e: React.MouseEvent) => {
-    console.log("Starting selection");
+    console.log("Starting selection process", e.button, e.target);
     // Only start selection if using the primary mouse button
     if (e.button !== 0) return;
     
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
     
-    const startX = (e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0)) / scale;
-    const startY = (e.clientY - rect.top + (canvasRef.current?.scrollTop || 0)) / scale;
+    // Calculate start position in canvas coordinates
+    // These are raw coordinates (not scaled)
+    const startX = e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0);
+    const startY = e.clientY - rect.top + (canvasRef.current?.scrollTop || 0);
+    
+    console.log("Selection starting at:", { startX, startY, scale });
     
     setIsSelecting(true);
     setSelectionBox({
@@ -63,8 +67,12 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!isSelecting || !selectionBox || !canvasRef.current) return;
     
     const rect = canvasRef.current.getBoundingClientRect();
-    const endX = (e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0)) / scale;
-    const endY = (e.clientY - rect.top + (canvasRef.current?.scrollTop || 0)) / scale;
+    // Calculate end position in canvas coordinates
+    // These are raw coordinates (not scaled)
+    const endX = e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0);
+    const endY = e.clientY - rect.top + (canvasRef.current?.scrollTop || 0);
+    
+    console.log("Selection updating to:", { endX, endY, scale });
     
     setSelectionBox({
       ...selectionBox,
@@ -83,20 +91,23 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     }
     
     // Convert selection box to normalized coordinates (top-left to bottom-right)
-    const left = Math.min(selectionBox.startX, selectionBox.endX);
-    const top = Math.min(selectionBox.startY, selectionBox.endY);
-    const right = Math.max(selectionBox.startX, selectionBox.endX);
-    const bottom = Math.max(selectionBox.startY, selectionBox.endY);
+    const left = Math.min(selectionBox.startX, selectionBox.endX) / scale;
+    const top = Math.min(selectionBox.startY, selectionBox.endY) / scale;
+    const right = Math.max(selectionBox.startX, selectionBox.endX) / scale;
+    const bottom = Math.max(selectionBox.startY, selectionBox.endY) / scale;
     
-    // Selection too small - could be a click
-    if (Math.abs(right - left) < 5 || Math.abs(bottom - top) < 5) {
+    console.log("Selection box normalized:", { left, top, right, bottom, scale });
+    
+    // Selection too small - could be a click - relaxed threshold
+    if (Math.abs(right - left) < 3 || Math.abs(bottom - top) < 3) {
+      console.log("Selection too small, treating as click");
       setIsSelecting(false);
       setSelectionBox(null);
       return;
     }
     
     const elements = getElements();
-    console.log("Found elements:", elements);
+    console.log("Found elements for selection:", elements);
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
@@ -104,12 +115,20 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
       const elementBottom = element.position.y + element.size.height;
       
       // Check if element intersects with the selection box
-      return (
+      const intersects = (
         element.position.x < right &&
         elementRight > left &&
         element.position.y < bottom &&
         elementBottom > top
       );
+      
+      console.log(`Element ${element.id} intersects: ${intersects}`, {
+        elementPos: element.position,
+        elementSize: element.size,
+        selectionBox: { left, top, right, bottom }
+      });
+      
+      return intersects;
     });
     
     console.log("Selected elements:", selected);

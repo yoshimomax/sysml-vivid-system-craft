@@ -17,13 +17,14 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
 }) => {
   return (
     <div
-      className={`absolute pointer-events-auto element-block ${isSelected ? 'element-selected' : ''}`}
+      className={`absolute element-block ${isSelected ? 'element-selected' : ''}`}
       style={{
         left: `${element.position.x}px`,
         top: `${element.position.y}px`,
         width: `${element.size.width}px`,
         height: `${element.size.height}px`,
-        zIndex: isSelected ? 10 : 1
+        zIndex: isSelected ? 10 : 1,
+        pointerEvents: "auto" // Explicitly enable pointer events
       }}
       data-element-id={element.id}
       data-type={element.type}

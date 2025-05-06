@@ -59,6 +59,7 @@
 /* Canvas content scale origin */
 .canvas-content {
   transform-origin: 0 0;
+  position: relative;
 }
 
 /* Help tooltip */
@@ -98,4 +99,18 @@
   padding: 0.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   z-index: 50;
+}
+
+/* Special pointerEvents handling */
+.canvas-pointer-none {
+  pointer-events: none;
+}
+
+.canvas-pointer-auto {
+  pointer-events: auto;
+}
+
+/* Element block - ensure proper pointer events */
+.element-block {
+  pointer-events: auto;
 }

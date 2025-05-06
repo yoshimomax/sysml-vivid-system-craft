@@ -38,14 +38,14 @@ export const CanvasContent: React.FC<CanvasContentProps> = ({
   return (
     <div 
       ref={contentRef}
-      className="absolute inset-0"
+      className="absolute inset-0 canvas-content"
       style={{
         transform: `scale(${scale})`,
         transformOrigin: '0 0'
       }}
     >
       {/* Grid background layer */}
-      <GridLayer />
+      <GridLayer className="pointer-events-none" />
       
       {/* Relationships layer */}
       <RelationshipLayer
@@ -59,11 +59,8 @@ export const CanvasContent: React.FC<CanvasContentProps> = ({
         onElementContextMenu={onElementContextMenu}
       />
       
-      {/* Selection box visualization */}
-      <SelectionBox 
-        isSelecting={isSelecting} 
-        selectionBox={selectionBox} 
-      />
+      {/* Selection box visualization - NOT inside the scaled content */}
     </div>
+    
   );
 };
