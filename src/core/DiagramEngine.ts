@@ -231,11 +231,9 @@ function alignElements(elementIds: string[], direction: 'left' | 'center' | 'rig
 /**
  * Start relationship creation
  */
-function startRelationshipCreation(sourceId: string, type: string) {
+function startRelationshipCreation(sourceId: string, type: RelationshipType) {
   const state = useModelingStore.getState();
-  state.setRelationshipSourceId(sourceId);
-  state.setRelationshipType(type as RelationshipType);
-  state.setIsCreatingRelationship(true);
+  state.startCreatingRelationship(sourceId, type);
 }
 
 /**
@@ -259,9 +257,7 @@ function completeRelationshipCreation(targetId: string) {
  */
 function cancelRelationshipCreation() {
   const state = useModelingStore.getState();
-  state.setRelationshipSourceId(null);
-  state.setRelationshipType(null);
-  state.setIsCreatingRelationship(false);
+  state.cancelCreatingRelationship();
 }
 
 /**

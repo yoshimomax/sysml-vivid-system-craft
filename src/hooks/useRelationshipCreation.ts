@@ -13,7 +13,7 @@ export const useRelationshipCreation = () => {
   /**
    * Start creating a relationship
    */
-  const startRelationship = (sourceId: string, type: string) => {
+  const startRelationship = (sourceId: string, type: RelationshipType) => {
     diagramEngine.startRelationshipCreation(sourceId, type);
   };
   
