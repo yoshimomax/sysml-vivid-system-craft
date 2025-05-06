@@ -80,6 +80,8 @@ export const ModelingCanvas: React.FC = () => {
     updateStoreSelection();
   }, [updateStoreSelection]);
   
+  console.log("ModelingCanvas render", {isSelecting, selectionBox, selectedElementIds});
+  
   return (
     <div className="flex h-full">
       <div

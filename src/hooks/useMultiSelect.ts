@@ -1,5 +1,5 @@
 
-import { useState, useCallback, RefObject, useMemo } from "react";
+import { useState, useCallback, RefObject, useEffect } from "react";
 import { diagramEngine } from "../core/DiagramEngine";
 import { useModelingStore } from "../store";
 
@@ -13,10 +13,21 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   } | null>(null);
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
   
+  // Get current scale from store
+  const scale = useModelingStore(state => state.scale);
+  
   // Get elements from store without subscribing to all changes
   const getElements = useCallback(() => {
     const activeDiagram = useModelingStore.getState().getActiveDiagram();
     return activeDiagram?.elements || [];
+  }, []);
+  
+  // Update local state when store selection changes
+  useEffect(() => {
+    const selectedIds = useModelingStore.getState().selectedElementIds;
+    if (selectedIds.length > 0) {
+      setSelectedElementIds(selectedIds);
+    }
   }, []);
   
   // Start selection process
@@ -28,8 +39,8 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
     
-    const startX = e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0);
-    const startY = e.clientY - rect.top + (canvasRef.current?.scrollTop || 0);
+    const startX = (e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0)) / scale;
+    const startY = (e.clientY - rect.top + (canvasRef.current?.scrollTop || 0)) / scale;
     
     setIsSelecting(true);
     setSelectionBox({
@@ -43,23 +54,24 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!e.shiftKey) {
       setSelectedElementIds([]);
       diagramEngine.selectElement(null);
+      diagramEngine.selectMultipleElements([]);
     }
-  }, [canvasRef]);
+  }, [canvasRef, scale]);
   
   // Update selection box as mouse moves
   const updateSelection = useCallback((e: React.MouseEvent) => {
     if (!isSelecting || !selectionBox || !canvasRef.current) return;
     
     const rect = canvasRef.current.getBoundingClientRect();
-    const endX = e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0);
-    const endY = e.clientY - rect.top + (canvasRef.current?.scrollTop || 0);
+    const endX = (e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0)) / scale;
+    const endY = (e.clientY - rect.top + (canvasRef.current?.scrollTop || 0)) / scale;
     
     setSelectionBox({
       ...selectionBox,
       endX,
       endY
     });
-  }, [isSelecting, selectionBox, canvasRef]);
+  }, [isSelecting, selectionBox, canvasRef, scale]);
   
   // End selection process and determine selected elements
   const endSelection = useCallback(() => {
@@ -91,21 +103,12 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
       const elementRight = element.position.x + element.size.width;
       const elementBottom = element.position.y + element.size.height;
       
-      // Apply current scale factor from the store to correctly calculate intersection
-      const scale = useModelingStore.getState().scale || 1;
-      
-      // Element bounds adjusted by scale
-      const scaledLeft = element.position.x * scale;
-      const scaledTop = element.position.y * scale;
-      const scaledRight = elementRight * scale;
-      const scaledBottom = elementBottom * scale;
-      
       // Check if element intersects with the selection box
       return (
-        scaledLeft < right &&
-        scaledRight > left &&
-        scaledTop < bottom &&
-        scaledBottom > top
+        element.position.x < right &&
+        elementRight > left &&
+        element.position.y < bottom &&
+        elementBottom > top
       );
     });
     
@@ -122,7 +125,7 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     
     setIsSelecting(false);
     setSelectionBox(null);
-  }, [isSelecting, selectionBox, getElements]);
+  }, [isSelecting, selectionBox, getElements, scale]);
   
   // Abort selection
   const cancelSelection = useCallback(() => {

@@ -1,5 +1,5 @@
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Position } from "../model/types";
 import { diagramEngine } from "../core/DiagramEngine";
 import { useModelingStore } from "../store";
@@ -51,20 +51,22 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
   
   // Handle canvas click
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    // Only process if target is the canvas itself
-    if (e.target !== canvasRef.current) return;
+    console.log("Canvas click", e.target, canvasRef.current);
     
-    // If relationship creation is in progress, cancel it
-    if (isCreatingRelationship) {
-      cancelRelationshipCreation();
-      return;
-    }
-    
-    // If not selecting or dragging, deselect all
-    if (!isSelecting && !isDragging) {
-      diagramEngine.selectElement(null);
-      diagramEngine.selectRelationship(null);
-      diagramEngine.selectMultipleElements([]);
+    // Only process if target is the canvas itself or a direct child (like the grid)
+    if (e.target === canvasRef.current || e.target === canvasRef.current?.firstChild) {
+      // If relationship creation is in progress, cancel it
+      if (isCreatingRelationship) {
+        cancelRelationshipCreation();
+        return;
+      }
+      
+      // If not selecting or dragging, deselect all
+      if (!isSelecting && !isDragging) {
+        diagramEngine.selectElement(null);
+        diagramEngine.selectRelationship(null);
+        diagramEngine.selectMultipleElements([]);
+      }
     }
   }, [canvasRef, isCreatingRelationship, cancelRelationshipCreation, isSelecting, isDragging]);
   
@@ -129,11 +131,18 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
   
   // Mouse down handler for canvas
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
+    console.log("Canvas mouse down", e.target, e.currentTarget);
+    
     // Only start selection with left mouse button
     if (e.button !== 0) return;
     
-    // Only if clicked directly on canvas, not on an element
-    if (e.target === canvasRef.current) {
+    // Check if the click is directly on the canvas (or grid) and not on an element
+    const isCanvas = e.target === canvasRef.current || 
+                     e.target === canvasRef.current?.firstChild ||
+                     (e.target as HTMLElement)?.classList.contains('canvas-wrapper');
+    
+    if (isCanvas) {
+      console.log("Starting selection from canvas click");
       startSelection(e);
     }
   }, [canvasRef, startSelection]);

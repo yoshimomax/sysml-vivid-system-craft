@@ -24,7 +24,7 @@ export const ElementLayer: React.FC<ElementLayerProps> = ({
   }
   
   return (
-    <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute inset-0">
       {elements.map(element => (
         <ElementRenderer
           key={element.id}

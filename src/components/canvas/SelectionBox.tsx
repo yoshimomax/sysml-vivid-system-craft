@@ -17,11 +17,11 @@ export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selecti
   const left = Math.min(selectionBox.startX, selectionBox.endX);
   const top = Math.min(selectionBox.startY, selectionBox.endY);
   const width = Math.abs(selectionBox.endX - selectionBox.startX);
-  const height = Math.abs(selectionBox.endY - selectionBox.startY);
+  const height = Math.abs(selectionBox.endY - selectionBox.endY);
 
   return (
     <div 
-      className="absolute border-2 border-blue-500 bg-blue-500/10 selection-box"
+      className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-50"
       style={{
         left,
         top,

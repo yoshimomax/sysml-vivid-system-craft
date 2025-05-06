@@ -14,6 +14,11 @@ export const useAlignmentActions = () => {
       console.log("Need at least 2 elements to align");
       return;
     }
+    
+    // Log selected elements for debugging
+    const elements = useModelingStore.getState().getSelectedElements();
+    console.log("Elements to align:", elements);
+    
     diagramEngine.alignElements(selectedElementIds, direction);
   }, [selectedElementIds]);
   
