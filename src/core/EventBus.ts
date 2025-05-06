@@ -28,10 +28,12 @@ export const DiagramEvents = {
   ELEMENT_UPDATED: 'element:updated',
   ELEMENT_REMOVED: 'element:removed',
   ELEMENT_SELECTED: 'element:selected',
+  ELEMENT_DELETED: 'element:deleted',
   RELATIONSHIP_ADDED: 'relationship:added',
   RELATIONSHIP_UPDATED: 'relationship:updated',
   RELATIONSHIP_REMOVED: 'relationship:removed',
-  RELATIONSHIP_SELECTED: 'relationship:selected'
+  RELATIONSHIP_SELECTED: 'relationship:selected',
+  RELATIONSHIP_DELETED: 'relationship:deleted'
 };
 
 // Export extended version of DiagramEvents from here as well for compatibility

@@ -92,6 +92,7 @@ export interface Relationship extends BaseElement {
   targetId: string;
   waypoints?: Position[];  // Added support for custom routing
   label?: string;          // Added support for relationship labels
+  description?: string;    // Added description field
   properties?: {
     lineStyle?: 'solid' | 'dashed' | 'dotted';
     lineColor?: string;

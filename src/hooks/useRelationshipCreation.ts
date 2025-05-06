@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Position } from "../model/types";
+import { Position, RelationshipType } from "../model/types";
 import { useModelingStore } from "../store/modelingStore";
 import { diagramEngine } from "../core/DiagramEngine";
 

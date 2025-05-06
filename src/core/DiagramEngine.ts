@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { useModelingStore } from "../store/modelingStore";
 import { Element, Relationship, ElementType, RelationshipType, Position } from "../model/types";
@@ -6,7 +7,7 @@ import { eventBus, DiagramEvents } from './EventBus';
 /**
  * Create a new element
  */
-function createElement(type: ElementType, name: string, position: Position, properties?: Record<string, any>) {
+function createElement(type: ElementType, position: Position, size?: { width: number, height: number }, name?: string, properties?: Record<string, any>) {
   const state = useModelingStore.getState();
   const activeDiagramId = state.activeDiagramId;
   
@@ -18,14 +19,14 @@ function createElement(type: ElementType, name: string, position: Position, prop
   const newElement: Element = {
     id: uuidv4(),
     type,
-    name,
+    name: name || `New ${type}`,
     position,
-    size: { width: 150, height: 100 },
+    size: size || { width: 150, height: 100 },
     properties: properties || {}
   };
   
   state.addElement(activeDiagramId, newElement);
-  eventBus.publish(DiagramEvents.ELEMENT_CREATED, newElement);
+  eventBus.publish(DiagramEvents.ELEMENT_ADDED, newElement);
   
   return newElement;
 }
@@ -38,7 +39,7 @@ function createRelationship(
   sourceId: string,
   targetId: string,
   name?: string,
-  points?: Position[]
+  waypoints?: Position[]
 ) {
   const state = useModelingStore.getState();
   const activeDiagramId = state.activeDiagramId;
@@ -54,11 +55,11 @@ function createRelationship(
     sourceId,
     targetId,
     name: name || '',
-    points: points || []
+    waypoints: waypoints || []
   };
   
   state.addRelationship(activeDiagramId, newRelationship);
-  eventBus.publish(DiagramEvents.RELATIONSHIP_CREATED, newRelationship);
+  eventBus.publish(DiagramEvents.RELATIONSHIP_ADDED, newRelationship);
   
   return newRelationship;
 }
@@ -110,13 +111,13 @@ function deleteElement(elementId: string) {
     
     relatedRelationships.forEach(rel => {
       state.removeRelationship(activeDiagramId, rel.id);
-      eventBus.publish(DiagramEvents.RELATIONSHIP_DELETED, rel.id);
+      eventBus.publish(DiagramEvents.RELATIONSHIP_REMOVED, rel.id);
     });
   }
   
   // Then delete the element itself
   state.removeElement(activeDiagramId, elementId);
-  eventBus.publish(DiagramEvents.ELEMENT_DELETED, elementId);
+  eventBus.publish(DiagramEvents.ELEMENT_REMOVED, elementId);
   
   // Clear selection if this was the selected element
   if (state.selectedElementId === elementId) {
@@ -137,7 +138,7 @@ function deleteRelationship(relationshipId: string) {
   }
   
   state.removeRelationship(activeDiagramId, relationshipId);
-  eventBus.publish(DiagramEvents.RELATIONSHIP_DELETED, relationshipId);
+  eventBus.publish(DiagramEvents.RELATIONSHIP_REMOVED, relationshipId);
   
   // Clear selection if this was the selected relationship
   if (state.selectedRelationshipId === relationshipId) {
@@ -167,6 +168,100 @@ function selectMultipleElements(elementIds: string[]) {
   if (elementIds.length > 0) {
     eventBus.publish(DiagramEvents.ELEMENT_SELECTED, elementIds);
   }
+}
+
+/**
+ * Delete multiple elements at once
+ */
+function deleteMultipleElements(elementIds: string[]) {
+  elementIds.forEach(id => deleteElement(id));
+}
+
+/**
+ * Align multiple elements
+ */
+function alignElements(elementIds: string[], direction: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') {
+  const state = useModelingStore.getState();
+  const elements = elementIds.map(id => state.getActiveDiagram()?.elements.find(e => e.id === id)).filter(Boolean) as Element[];
+  
+  if (elements.length <= 1) return;
+  
+  // Calculate bounds
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  
+  elements.forEach(el => {
+    minX = Math.min(minX, el.position.x);
+    maxX = Math.max(maxX, el.position.x + el.size.width);
+    minY = Math.min(minY, el.position.y);
+    maxY = Math.max(maxY, el.position.y + el.size.height);
+  });
+  
+  // Perform alignment
+  elements.forEach(el => {
+    const updates: Partial<Element> = { position: { ...el.position } };
+    
+    switch (direction) {
+      case 'left':
+        updates.position.x = minX;
+        break;
+      case 'center':
+        updates.position.x = (minX + maxX) / 2 - el.size.width / 2;
+        break;
+      case 'right':
+        updates.position.x = maxX - el.size.width;
+        break;
+      case 'top':
+        updates.position.y = minY;
+        break;
+      case 'middle':
+        updates.position.y = (minY + maxY) / 2 - el.size.height / 2;
+        break;
+      case 'bottom':
+        updates.position.y = maxY - el.size.height;
+        break;
+    }
+    
+    updateElement(el.id, updates);
+  });
+}
+
+/**
+ * Start relationship creation
+ */
+function startRelationshipCreation(sourceId: string, type: string) {
+  const state = useModelingStore.getState();
+  state.setRelationshipSourceId(sourceId);
+  state.setRelationshipType(type as RelationshipType);
+  state.setIsCreatingRelationship(true);
+}
+
+/**
+ * Complete relationship creation
+ */
+function completeRelationshipCreation(targetId: string) {
+  const state = useModelingStore.getState();
+  const sourceId = state.relationshipSourceId;
+  const type = state.relationshipType;
+  
+  if (sourceId && type) {
+    createRelationship(type, sourceId, targetId);
+  }
+  
+  // Reset relationship creation state
+  cancelRelationshipCreation();
+}
+
+/**
+ * Cancel relationship creation
+ */
+function cancelRelationshipCreation() {
+  const state = useModelingStore.getState();
+  state.setRelationshipSourceId(null);
+  state.setRelationshipType(null);
+  state.setIsCreatingRelationship(false);
 }
 
 /**
@@ -233,9 +328,14 @@ export const diagramEngine = {
   deleteRelationship,
   selectElement,
   selectMultipleElements,
+  deleteMultipleElements,
+  alignElements,
   selectRelationship,
   getState,
   getElementById,
   zoomIn,
-  zoomOut
+  zoomOut,
+  startRelationshipCreation,
+  completeRelationshipCreation,
+  cancelRelationshipCreation
 };
