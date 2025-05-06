@@ -1,177 +1,118 @@
 
-/* ... keep existing code */
+/* Add or update the following styles in modeling.css */
 
-/* Enhanced element styling with SysML v2 compartments */
+/* Element styles */
 .element-block {
+  position: absolute;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+  border-radius: 4px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  user-select: none;
-  min-height: 60px;
-  min-width: 120px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
 }
 
-.element-selected {
-  border: 2px solid var(--color-selected, #9b87f5);
-  box-shadow: 0 0 8px var(--color-selected-shadow, rgba(155, 135, 245, 0.5));
+.element-block.element-selected {
+  box-shadow: 0 0 0 2px hsl(var(--primary));
 }
 
-/* Element header */
 .element-block .header {
-  padding: 4px 8px;
-  border-bottom: 1px solid #ddd;
-  background-color: #f8f9fa;
+  padding: 6px;
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
   font-weight: 500;
   font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
-.element-title {
-  width: 100%;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Element compartments */
-.compartments {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.compartment {
-  border-bottom: 1px solid #eee;
-  padding: 4px 0;
-  font-size: 12px;
-}
-
-.compartment:last-child {
-  border-bottom: none;
-}
-
-.compartment-header {
-  font-size: 11px;
-  font-weight: 500;
-  color: #666;
-  padding: 0 8px;
-  background-color: #f8f8f8;
-}
-
-.compartment-content {
-  padding: 2px 8px;
-  max-height: 80px;
-  overflow-y: auto;
-}
-
-.property, .internal-action {
-  padding: 1px 0;
-}
-
-.action-type {
-  font-weight: 500;
-  color: #555;
-}
-
-.empty-compartment {
-  color: #999;
-  font-style: italic;
-  padding: 1px 0;
-}
-
-/* Special styling for requirement elements */
-.element-requirement {
-  background-color: #fefce8;
-}
-
-.requirement-id {
-  font-weight: 500;
-  color: #666;
-}
-
-.requirement-priority {
-  color: #666;
-}
-
-/* Special styling for state elements */
-.element-state {
-  background-color: #f0f9ff;
-}
-
-/* Special styling for part/class elements */
-.element-part, .element-class {
-  background-color: #f8fafc;
-}
-
-/* Element handles for connection points */
+/* Resize handles */
 .element-handle {
   position: absolute;
   width: 8px;
   height: 8px;
-  background-color: var(--color-selected, #9b87f5);
-  border: 1px solid white;
+  background-color: hsl(var(--primary));
+  border: 1px solid hsl(var(--background));
   border-radius: 50%;
+  z-index: 20;
+  cursor: nwse-resize;
 }
 
 .element-handle.n {
   top: -4px;
   left: 50%;
   transform: translateX(-50%);
-  cursor: n-resize;
+  cursor: ns-resize;
 }
 
 .element-handle.e {
   right: -4px;
   top: 50%;
   transform: translateY(-50%);
-  cursor: e-resize;
+  cursor: ew-resize;
 }
 
 .element-handle.s {
   bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
-  cursor: s-resize;
+  cursor: ns-resize;
 }
 
 .element-handle.w {
   left: -4px;
   top: 50%;
   transform: translateY(-50%);
-  cursor: w-resize;
+  cursor: ew-resize;
 }
 
-/* Diagonal handles */
 .element-handle.ne {
   top: -4px;
   right: -4px;
-  cursor: ne-resize;
+  cursor: nesw-resize;
 }
 
 .element-handle.se {
   bottom: -4px;
   right: -4px;
-  cursor: se-resize;
+  cursor: nwse-resize;
 }
 
 .element-handle.sw {
   bottom: -4px;
   left: -4px;
-  cursor: sw-resize;
+  cursor: nesw-resize;
 }
 
 .element-handle.nw {
   top: -4px;
   left: -4px;
-  cursor: nw-resize;
+  cursor: nwse-resize;
 }
 
-/* ... keep existing code for relationships and other elements */
+/* Context menu */
+.relationship-context-menu {
+  z-index: 1000;
+}
+
+/* Canvas */
+:root {
+  --canvas-bg: 0 0% 100%; /* white in light theme */
+  --canvas-grid: 0 0% 90%; /* light gray in light theme */
+}
+
+.dark {
+  --canvas-bg: 222.2 84% 4.9%; /* dark in dark theme */
+  --canvas-grid: 217.2 32.6% 17.5%; /* dark gray grid in dark theme */
+}
+
+.canvas-wrapper {
+  position: relative;
+  background-color: hsl(var(--canvas-bg));
+}
+
+/* Element content scrollable */
+.element-content {
+  overflow-y: auto;
+  max-height: calc(100% - 32px);
+}

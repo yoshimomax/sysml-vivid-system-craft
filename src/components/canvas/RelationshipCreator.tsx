@@ -1,94 +1,85 @@
 
 import React from "react";
 import { RelationshipType } from "../../model/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
+import { 
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger 
+} from "../ui/context-menu";
 
 interface RelationshipCreatorProps {
   visible: boolean;
-  position: { x: number; y: number };
+  position: { x: number, y: number };
   onSelectType: (type: RelationshipType) => void;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 export const RelationshipCreator: React.FC<RelationshipCreatorProps> = ({
   visible,
   position,
-  onSelectType,
-  onCancel
+  onSelectType
 }) => {
-  if (!visible) return null;
-  
-  // SysML v2 relationship types based on documentation
-  const relationshipTypes: { type: RelationshipType; label: string; description: string }[] = [
-    { 
-      type: "Dependency", 
-      label: "Dependency", 
-      description: "General dependency relationship" 
-    },
-    { 
-      type: "Specialization", 
-      label: "Specialization", 
-      description: "Type specialization" 
-    },
-    { 
-      type: "Reference", 
-      label: "Reference", 
-      description: "Feature reference" 
-    },
-    { 
-      type: "Containment", 
-      label: "Containment", 
-      description: "Containment relationship" 
-    },
-    { 
-      type: "Dependency", 
-      label: "Composition", 
-      description: "Composite aggregation" 
-    },
-    { 
-      type: "Dependency", 
-      label: "Association", 
-      description: "General association" 
-    }
+  if (!visible || !position) return null;
+
+  // Available relationship types
+  const relationshipTypes: RelationshipType[] = [
+    'Specialization',
+    'Dependency',
+    'Containment',
+    'Reference',
+    'Subsetting',
+    'Redefinition',
+    'Binding',
+    'ItemFlowConnection',
+    'Satisfy',
+    'Verify',
+    'Allocate'
   ];
-  
+
+  // Get friendly names for relationship types
+  const getRelationshipName = (type: RelationshipType) => {
+    const names: Record<RelationshipType, string> = {
+      'Specialization': 'Generalization',
+      'Dependency': 'Dependency',
+      'Containment': 'Composition',
+      'Reference': 'Association',
+      'Subsetting': 'Subset',
+      'Redefinition': 'Redefine',
+      'Binding': 'Binding',
+      'ItemFlowConnection': 'Item Flow',
+      'Satisfy': 'Satisfy',
+      'Verify': 'Verify',
+      'Allocate': 'Allocate'
+    };
+    return names[type] || type;
+  };
+
   return (
-    <div
-      className="fixed bg-card rounded-md shadow-md border p-1 z-[9999]"
-      style={{
-        left: position.x,
+    <div 
+      className="absolute relationship-context-menu"
+      style={{ 
+        left: position.x, 
         top: position.y
       }}
-      onClick={(e) => e.stopPropagation()}
     >
-      <div className="text-sm font-medium p-2 border-b">Create Relationship</div>
-      <ScrollArea className="max-h-64">
-        <div className="space-y-1 p-1">
-          {relationshipTypes.map((item) => (
+      <div className="bg-card border rounded shadow-lg p-1 z-50">
+        <div className="text-sm font-medium px-2 py-1 border-b mb-1">
+          Create Relationship
+        </div>
+        <div className="max-h-64 overflow-y-auto">
+          {relationshipTypes.map(type => (
             <Button
-              key={item.type + item.label}
+              key={type}
               variant="ghost"
-              className="w-full justify-start text-sm h-8 px-2"
-              onClick={() => onSelectType(item.type)}
+              className="w-full justify-start text-left text-sm py-1"
+              onClick={() => onSelectType(type)}
             >
-              <span>{item.label}</span>
-              <span className="ml-auto text-xs text-muted-foreground truncate max-w-[100px]">
-                {item.description}
-              </span>
+              {getRelationshipName(type)}
             </Button>
           ))}
         </div>
-      </ScrollArea>
-      <div className="pt-1 pb-1 border-t mt-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full text-muted-foreground"
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
       </div>
     </div>
   );

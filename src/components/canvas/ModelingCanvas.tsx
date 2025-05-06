@@ -36,7 +36,6 @@ export const ModelingCanvas: React.FC = () => {
     zoomIn,
     zoomOut,
     resetZoom,
-    handleWheelZoom,
     setScale: setLocalScale
   } = useZoom();
   
@@ -56,12 +55,13 @@ export const ModelingCanvas: React.FC = () => {
     handleCanvasContextMenu,
     handleCanvasMouseDown,
     handleElementContextMenu,
+    handleElementMouseDown,
     handleRelationshipClick,
     handleRelationshipTypeSelect,
     handleMouseMove,
     handleMouseUp,
     handleMouseLeave,
-    handleDragStart,
+    handleWheel,
     updateStoreSelection,
     isCreatingRelationship,
     tempEndPoint,
@@ -81,8 +81,6 @@ export const ModelingCanvas: React.FC = () => {
     updateStoreSelection();
   }, [updateStoreSelection]);
   
-  console.log("ModelingCanvas render", {isSelecting, selectionBox, selectedElementIds, scale});
-  
   return (
     <div className="flex h-full">
       <div
@@ -94,7 +92,7 @@ export const ModelingCanvas: React.FC = () => {
         onMouseLeave={handleMouseLeave}
         onClick={handleCanvasClick}
         onContextMenu={handleCanvasContextMenu}
-        onWheel={handleWheelZoom}
+        onWheel={handleWheel}
       >
         {/* Help tooltip */}
         <HelpTooltip visible={showHelp} />
@@ -134,7 +132,7 @@ export const ModelingCanvas: React.FC = () => {
               tempEndPoint,
               type: relationshipType
             }}
-            onElementMouseDown={(e, elementId) => handleDragStart(e, elementId, canvasRef)}
+            onElementMouseDown={handleElementMouseDown}
             onElementContextMenu={handleElementContextMenu}
             onRelationshipClick={handleRelationshipClick}
           />

@@ -22,6 +22,12 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
     return `${baseClass} ${isSelected ? 'element-selected' : ''}`;
   };
 
+  // Handle preventing propagation for element content scrolling
+  const handleContentWheel = (e: React.WheelEvent) => {
+    // Stop propagation to prevent canvas zoom when scrolling inside element
+    e.stopPropagation();
+  };
+
   return (
     <div
       className={getElementClass()}
@@ -44,6 +50,7 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
         e.stopPropagation();
         onContextMenu(e);
       }}
+      onWheel={handleContentWheel}
     >
       {/* Element header with stereotype and name */}
       <div className="header">
@@ -54,14 +61,14 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
       {/* Element compartments */}
       <ElementCompartments element={element} />
       
-      {/* Connection handles */}
+      {/* Resizing handles - only show when selected */}
       {isSelected && (
         <>
           <div className="element-handle n" data-handle="n" />
           <div className="element-handle e" data-handle="e" />
           <div className="element-handle s" data-handle="s" />
           <div className="element-handle w" data-handle="w" />
-          {/* Add diagonal handles for more connection points */}
+          {/* Add diagonal handles for more precise resizing */}
           <div className="element-handle ne" data-handle="ne" />
           <div className="element-handle se" data-handle="se" />
           <div className="element-handle sw" data-handle="sw" />
