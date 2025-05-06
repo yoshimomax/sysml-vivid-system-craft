@@ -245,7 +245,8 @@ function completeRelationshipCreation(targetId: string) {
   const type = state.relationshipType;
   
   if (sourceId && type) {
-    createRelationship(type, sourceId, targetId);
+    // Convert the type string to RelationshipType
+    createRelationship(type as RelationshipType, sourceId, targetId);
   }
   
   // Reset relationship creation state
