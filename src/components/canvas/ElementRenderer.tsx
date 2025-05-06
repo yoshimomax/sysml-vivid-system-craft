@@ -28,9 +28,13 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
       }}
       data-element-id={element.id}
       data-type={element.type}
-      onMouseDown={onMouseDown}
+      onMouseDown={(e) => {
+        e.stopPropagation(); // Stop event from reaching canvas
+        onMouseDown(e);
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
+        e.stopPropagation(); // Stop event from reaching canvas
         onContextMenu(e);
       }}
     >

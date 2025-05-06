@@ -3,7 +3,6 @@ import React from "react";
 import { GridLayer } from "./GridLayer";
 import { ElementLayer } from "./ElementLayer";
 import { RelationshipLayer } from "./RelationshipLayer";
-import { SelectionBox } from "./SelectionBox";
 
 interface CanvasContentProps {
   scale: number;
@@ -59,8 +58,7 @@ export const CanvasContent: React.FC<CanvasContentProps> = ({
         onElementContextMenu={onElementContextMenu}
       />
       
-      {/* Selection box visualization - NOT inside the scaled content */}
+      {/* Selection box is now rendered outside the scaled content in ModelingCanvas */}
     </div>
-    
   );
 };

@@ -10,6 +10,7 @@ export const useElementDrag = () => {
   const startDragging = useModelingStore(state => state.startDragging);
   const stopDragging = useModelingStore(state => state.stopDragging);
   const selectedElement = useModelingStore(state => state.getSelectedElement());
+  const selectedElementIds = useModelingStore(state => state.selectedElementIds);
   const updateElement = useModelingStore(state => state.updateElement);
   
   /**
@@ -26,8 +27,15 @@ export const useElementDrag = () => {
       return;
     }
     
-    // Use direct store method to avoid unnecessary re-renders
-    diagramEngine.selectElement(elementId);
+    // Check if we're clicking on an already selected element in a multi-selection
+    const currentSelectedIds = useModelingStore.getState().selectedElementIds;
+    if (currentSelectedIds.length > 1 && currentSelectedIds.includes(elementId)) {
+      // Don't change selection, just start dragging
+      console.log("Dragging within multi-selection");
+    } else {
+      // Use direct store method to set selection to this element
+      diagramEngine.selectElement(elementId);
+    }
     
     // Calculate offset from mouse position to element top-left
     const canvasRect = canvasRef.current?.getBoundingClientRect();
@@ -64,9 +72,32 @@ export const useElementDrag = () => {
       y: mouseY - dragOffset.y
     };
     
-    // Use direct store method to update element position
-    updateElement(selectedElement.id, { position: newPosition });
-  }, [isDragging, selectedElement, dragOffset, updateElement]);
+    // Get the current scale from the store
+    const scale = useModelingStore.getState().scale;
+    
+    // Check if we need to move multiple elements
+    if (selectedElementIds.length > 1) {
+      selectedElementIds.forEach(id => {
+        const element = useModelingStore.getState().getActiveDiagram()?.elements.find(e => e.id === id);
+        if (element) {
+          // Calculate relative movement
+          const deltaX = (newPosition.x - selectedElement.position.x);
+          const deltaY = (newPosition.y - selectedElement.position.y);
+          
+          // Apply movement to this element
+          updateElement(id, { 
+            position: {
+              x: element.position.x + deltaX,
+              y: element.position.y + deltaY
+            }
+          });
+        }
+      });
+    } else {
+      // Only move the selected element
+      updateElement(selectedElement.id, { position: newPosition });
+    }
+  }, [isDragging, selectedElement, dragOffset, updateElement, selectedElementIds]);
   
   /**
    * Handle drag end
@@ -74,6 +105,7 @@ export const useElementDrag = () => {
   const handleDragEnd = useCallback(() => {
     if (isDragging) {
       stopDragging();
+      // Don't clear the selection here - we want selection to persist after drag
     }
   }, [isDragging, stopDragging]);
   

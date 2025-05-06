@@ -24,11 +24,15 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
   
   // Update local state when store selection changes
   useEffect(() => {
-    const selectedIds = useModelingStore.getState().selectedElementIds;
-    if (selectedIds.length > 0) {
-      setSelectedElementIds(selectedIds);
-    }
-  }, []);
+    const unsubscribe = useModelingStore.subscribe((state) => {
+      const storeSelectedIds = state.selectedElementIds;
+      if (JSON.stringify(storeSelectedIds) !== JSON.stringify(selectedElementIds)) {
+        setSelectedElementIds(storeSelectedIds);
+      }
+    });
+    
+    return () => unsubscribe();
+  }, [selectedElementIds]);
   
   // Start selection process
   const startSelection = useCallback((e: React.MouseEvent) => {
@@ -57,8 +61,8 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     // Clear selection if not holding shift
     if (!e.shiftKey) {
       setSelectedElementIds([]);
-      diagramEngine.selectElement(null);
-      diagramEngine.selectMultipleElements([]);
+      // We don't immediately clear the store selection here, we'll do it on selection end
+      // if no elements were found
     }
   }, [canvasRef, scale]);
   
@@ -91,6 +95,7 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     }
     
     // Convert selection box to normalized coordinates (top-left to bottom-right)
+    // Use scale to convert from screen coordinates to canvas coordinates
     const left = Math.min(selectionBox.startX, selectionBox.endX) / scale;
     const top = Math.min(selectionBox.startY, selectionBox.endY) / scale;
     const right = Math.max(selectionBox.startX, selectionBox.endX) / scale;
@@ -98,8 +103,8 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     
     console.log("Selection box normalized:", { left, top, right, bottom, scale });
     
-    // Selection too small - could be a click - relaxed threshold
-    if (Math.abs(right - left) < 3 || Math.abs(bottom - top) < 3) {
+    // Selection too small - could be a click - use smaller threshold
+    if (Math.abs(right - left) < 2 && Math.abs(bottom - top) < 2) {
       console.log("Selection too small, treating as click");
       setIsSelecting(false);
       setSelectionBox(null);
@@ -107,7 +112,7 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     }
     
     const elements = getElements();
-    console.log("Found elements for selection:", elements);
+    console.log("Found elements for selection:", elements.length);
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
@@ -131,15 +136,20 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
       return intersects;
     });
     
-    console.log("Selected elements:", selected);
+    console.log("Selected elements:", selected.length);
     const selectedIds = selected.map(el => el.id);
     
     if (selectedIds.length > 0) {
       setSelectedElementIds(selectedIds);
       
-      // Use direct call to avoid infinite updates
+      // Use the store action to update selection
       const selectMultipleElements = useModelingStore.getState().selectMultipleElements;
       selectMultipleElements(selectedIds);
+    } else if (!selectedIds.length) {
+      // Only clear selection if we actually performed a selection (not just a click)
+      // and no elements were found
+      diagramEngine.selectElement(null);
+      diagramEngine.selectMultipleElements([]);
     }
     
     setIsSelecting(false);

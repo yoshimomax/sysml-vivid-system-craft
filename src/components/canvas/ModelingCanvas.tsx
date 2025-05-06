@@ -100,13 +100,11 @@ export const ModelingCanvas: React.FC = () => {
         <HelpTooltip visible={showHelp} />
         
         {/* Show selection box directly in canvas (outside of scaled content) */}
-        {isSelecting && selectionBox && (
-          <SelectionBox 
-            isSelecting={isSelecting} 
-            selectionBox={selectionBox}
-            scale={1} // Selection box is outside scaled content
-          />
-        )}
+        <SelectionBox 
+          isSelecting={isSelecting} 
+          selectionBox={selectionBox}
+          scale={scale}
+        />
         
         {/* Multi-selection action panel */}
         {selectedElementIds.length > 1 && (

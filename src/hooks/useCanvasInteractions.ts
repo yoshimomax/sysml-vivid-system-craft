@@ -59,6 +59,12 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
       e.target === canvasRef.current?.firstChild ||
       (e.target as Element)?.closest('.canvas-wrapper');
     
+    // If this is the end of a selection or drag, don't reset the selection
+    if (isSelecting || isDragging) {
+      console.log("Skipping deselection during selection/drag");
+      return;
+    }
+    
     if (isCanvas) {
       // If relationship creation is in progress, cancel it
       if (isCreatingRelationship) {
@@ -66,8 +72,11 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
         return;
       }
       
-      // If not selecting or dragging, deselect all
-      if (!isSelecting && !isDragging) {
+      // Only deselect when specifically clicking on empty canvas
+      // and not at the end of a drag or selection operation
+      const isGridLayerClick = (e.target as Element)?.closest('.grid-layer');
+      if (isGridLayerClick) {
+        console.log("Deselecting all elements on grid layer click");
         diagramEngine.selectElement(null);
         diagramEngine.selectRelationship(null);
         diagramEngine.selectMultipleElements([]);
@@ -135,6 +144,7 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
     
     if (isDragging) {
       handleDragEnd();
+      return; // Add return to prevent unintended deselection
     }
   }, [isSelecting, endSelection, isDragging, handleDragEnd]);
   
@@ -154,7 +164,7 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
       e.preventDefault(); // Prevent default to ensure we capture the event
       startSelection(e);
     }
-  }, [canvasRef, startSelection]);
+  }, [startSelection]);
   
   const handleMouseLeave = useCallback(() => {
     console.log("Mouse leave detected", { isSelecting, isDragging });

@@ -35,6 +35,7 @@
 .element-selected {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
 /* Ensure context menu has proper z-index */
@@ -113,4 +114,50 @@
 /* Element block - ensure proper pointer events */
 .element-block {
   pointer-events: auto;
+  user-select: none;
+  transition: box-shadow 0.2s ease;
+}
+
+/* Grid layer */
+.grid-layer {
+  pointer-events: auto;
+}
+
+/* Selection handles */
+.element-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border: 1px solid #3b82f6;
+  pointer-events: auto;
+  z-index: 15;
+}
+
+.element-handle.n {
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: n-resize;
+}
+
+.element-handle.e {
+  top: 50%;
+  right: -4px;
+  transform: translateY(-50%);
+  cursor: e-resize;
+}
+
+.element-handle.s {
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: s-resize;
+}
+
+.element-handle.w {
+  top: 50%;
+  left: -4px;
+  transform: translateY(-50%);
+  cursor: w-resize;
 }

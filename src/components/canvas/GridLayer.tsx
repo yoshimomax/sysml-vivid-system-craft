@@ -8,7 +8,7 @@ interface GridLayerProps {
 export const GridLayer: React.FC<GridLayerProps> = ({ className }) => {
   return (
     <div 
-      className={`absolute inset-0 pointer-events-none ${className || ''}`}
+      className={`absolute inset-0 grid-layer ${className || ''}`}
       style={{
         backgroundImage: `
           linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
