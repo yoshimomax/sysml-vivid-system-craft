@@ -1,137 +1,124 @@
 
-/* Add to existing modeling.css */
+/* ... keep existing code */
 
-/* Selection box styling */
-.selection-box {
-  position: absolute;
-  border: 2px dashed #3b82f6;
-  background-color: rgba(59, 130, 246, 0.1);
-  pointer-events: none;
-  z-index: 1000;
-}
-
-/* Relationship path styling */
-.relationship-path {
-  stroke: currentColor;
-  stroke-width: 2px;
-  fill: none;
-  pointer-events: stroke;
-  cursor: pointer;
-}
-
-.relationship-path-temp {
-  stroke: #3b82f6;
-  stroke-width: 1.5px;
-  stroke-dasharray: 5,5;
-  fill: none;
-}
-
-.relationship-selected {
-  stroke: #3b82f6;
-  stroke-width: 3px;
-}
-
-/* Element selected styling */
-.element-selected {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-}
-
-/* Ensure context menu has proper z-index */
-.relationship-creator {
-  z-index: 9999;
-}
-
-/* Make sure elements are draggable */
-.element-draggable {
-  cursor: move;
-}
-
-/* Selection box on canvas */
-.canvas-wrapper {
-  position: relative;
-  overflow: auto;
-  width: 100%;
-  height: 100%;
-  cursor: default;
-}
-
-/* Canvas content scale origin */
-.canvas-content {
-  transform-origin: 0 0;
-  position: relative;
-}
-
-/* Help tooltip */
-.help-tooltip {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  z-index: 1000;
-  pointer-events: none;
-}
-
-/* Selection Box visual styling */
-.selection-box {
-  position: absolute;
-  border: 2px dashed #3b82f6;
-  background-color: rgba(59, 130, 246, 0.1);
-  z-index: 1000;
-  pointer-events: none;
-}
-
-/* Multi-element selection indicator */
-.element-multi-selected {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Selection action panel */
-.selection-panel {
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.375rem;
-  padding: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 50;
-}
-
-/* Special pointerEvents handling */
-.canvas-pointer-none {
-  pointer-events: none;
-}
-
-.canvas-pointer-auto {
-  pointer-events: auto;
-}
-
-/* Element block - ensure proper pointer events */
+/* Enhanced element styling with SysML v2 compartments */
 .element-block {
-  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   user-select: none;
-  transition: box-shadow 0.2s ease;
+  min-height: 60px;
+  min-width: 120px;
 }
 
-/* Grid layer */
-.grid-layer {
-  pointer-events: auto;
+.element-selected {
+  border: 2px solid var(--color-selected, #9b87f5);
+  box-shadow: 0 0 8px var(--color-selected-shadow, rgba(155, 135, 245, 0.5));
 }
 
-/* Selection handles */
+/* Element header */
+.element-block .header {
+  padding: 4px 8px;
+  border-bottom: 1px solid #ddd;
+  background-color: #f8f9fa;
+  font-weight: 500;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.element-title {
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Element compartments */
+.compartments {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.compartment {
+  border-bottom: 1px solid #eee;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.compartment:last-child {
+  border-bottom: none;
+}
+
+.compartment-header {
+  font-size: 11px;
+  font-weight: 500;
+  color: #666;
+  padding: 0 8px;
+  background-color: #f8f8f8;
+}
+
+.compartment-content {
+  padding: 2px 8px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.property, .internal-action {
+  padding: 1px 0;
+}
+
+.action-type {
+  font-weight: 500;
+  color: #555;
+}
+
+.empty-compartment {
+  color: #999;
+  font-style: italic;
+  padding: 1px 0;
+}
+
+/* Special styling for requirement elements */
+.element-requirement {
+  background-color: #fefce8;
+}
+
+.requirement-id {
+  font-weight: 500;
+  color: #666;
+}
+
+.requirement-priority {
+  color: #666;
+}
+
+/* Special styling for state elements */
+.element-state {
+  background-color: #f0f9ff;
+}
+
+/* Special styling for part/class elements */
+.element-part, .element-class {
+  background-color: #f8fafc;
+}
+
+/* Element handles for connection points */
 .element-handle {
   position: absolute;
   width: 8px;
   height: 8px;
-  background-color: white;
-  border: 1px solid #3b82f6;
-  pointer-events: auto;
-  z-index: 15;
+  background-color: var(--color-selected, #9b87f5);
+  border: 1px solid white;
+  border-radius: 50%;
 }
 
 .element-handle.n {
@@ -142,8 +129,8 @@
 }
 
 .element-handle.e {
-  top: 50%;
   right: -4px;
+  top: 50%;
   transform: translateY(-50%);
   cursor: e-resize;
 }
@@ -156,8 +143,35 @@
 }
 
 .element-handle.w {
-  top: 50%;
   left: -4px;
+  top: 50%;
   transform: translateY(-50%);
   cursor: w-resize;
 }
+
+/* Diagonal handles */
+.element-handle.ne {
+  top: -4px;
+  right: -4px;
+  cursor: ne-resize;
+}
+
+.element-handle.se {
+  bottom: -4px;
+  right: -4px;
+  cursor: se-resize;
+}
+
+.element-handle.sw {
+  bottom: -4px;
+  left: -4px;
+  cursor: sw-resize;
+}
+
+.element-handle.nw {
+  top: -4px;
+  left: -4px;
+  cursor: nw-resize;
+}
+
+/* ... keep existing code for relationships and other elements */

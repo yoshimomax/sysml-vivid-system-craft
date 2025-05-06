@@ -57,7 +57,10 @@ export type SysMLElementType =
   | 'ViewDefinition'
   | 'ViewUsage'
   | 'ViewpointDefinition'
-  | 'Package';
+  | 'Package'
+  | 'ConstraintBlock'     // Added for parametric diagrams
+  | 'ConstraintProperty'  // Added for parametric diagrams
+  | 'ValueProperty';      // Added for parametric properties
 
 // Combined element type
 export type ElementType = KerMLElementType | SysMLElementType;
@@ -72,8 +75,9 @@ export type RelationshipType =
   | 'Redefinition'
   | 'Binding'
   | 'ItemFlowConnection'
-  | 'Satisfy'
-  | 'Verify';
+  | 'Satisfy'        // Requirement satisfaction relationship
+  | 'Verify'         // Requirement verification relationship
+  | 'Allocate';      // Allocation relationship
 
 // Modeling Element with type information
 export interface Element extends DiagramElement {
@@ -86,7 +90,13 @@ export interface Relationship extends BaseElement {
   type: RelationshipType;
   sourceId: string;
   targetId: string;
-  points?: Position[];
+  waypoints?: Position[];  // Added support for custom routing
+  label?: string;          // Added support for relationship labels
+  properties?: {
+    lineStyle?: 'solid' | 'dashed' | 'dotted';
+    lineColor?: string;
+    lineWidth?: number;
+  };
 }
 
 // Diagram representation

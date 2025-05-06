@@ -19,13 +19,24 @@ export const ElementLayer: React.FC<ElementLayerProps> = ({
   const selectedElementId = useModelingStore(state => state.selectedElementId);
   const selectedElementIds = useModelingStore(state => state.selectedElementIds);
   
-  if (elements.length === 0) {
+  // Sort elements so selected ones are rendered on top
+  const sortedElements = [...elements].sort((a, b) => {
+    // Selected elements on top
+    const aSelected = a.id === selectedElementId || selectedElementIds.includes(a.id);
+    const bSelected = b.id === selectedElementId || selectedElementIds.includes(b.id);
+    
+    if (aSelected && !bSelected) return 1;
+    if (!aSelected && bSelected) return -1;
+    return 0;
+  });
+  
+  if (sortedElements.length === 0) {
     return null;
   }
   
   return (
     <div className="absolute inset-0">
-      {elements.map(element => (
+      {sortedElements.map(element => (
         <ElementRenderer
           key={element.id}
           element={element}
