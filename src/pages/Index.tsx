@@ -8,6 +8,7 @@ import { ElementsPanel } from "@/components/panels/ElementsPanel";
 import { ModelingCanvas } from "@/components/canvas/ModelingCanvas"; // Ensure we're using the advanced one
 import PropertiesPanel from "@/components/PropertiesPanel";
 import { useModelingStore } from "@/store/modelingStore";
+import { Element, Relationship } from "@/model/types"; // Changed from types/sysml to model/types
 
 const Index = () => {
   const { toast } = useToast();
@@ -64,11 +65,11 @@ const Index = () => {
   };
 
   // Handlers for updating elements and relationships
-  const handleElementUpdate = (element: any) => {
+  const handleElementUpdate = (element: Element) => {
     updateElement(element.id, element);
   };
 
-  const handleRelationshipUpdate = (relationship: any) => {
+  const handleRelationshipUpdate = (relationship: Relationship) => {
     updateRelationship(relationship.id, relationship);
   };
 

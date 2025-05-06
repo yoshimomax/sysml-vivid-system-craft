@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Element, Relationship } from "@/types/sysml";
+import { Element, Relationship } from "@/model/types"; // Changed from types/sysml to model/types
 import PropertyGroup from "./properties/PropertyGroup";
 import GeneralProperties from "./properties/GeneralProperties";
 import PositionSizeProperties from "./properties/PositionSizeProperties";

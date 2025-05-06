@@ -42,7 +42,10 @@ export type SysMLElementType =
   | 'ViewDefinition'   // Definition of a view
   | 'ViewUsage'        // Usage of a view
   | 'ViewpointDefinition' // Definition of a viewpoint
-  | 'Package';         // Package container
+  | 'Package'          // Package container
+  | 'ConstraintBlock'  // Constraint block for parametric diagrams
+  | 'ConstraintProperty' // Constraint property for parametrics
+  | 'ValueProperty';   // Value property for parametrics
 
 // Combined type for all element types
 export type ElementType = KerMLElementType | SysMLElementType;
@@ -58,7 +61,8 @@ export type RelationshipType =
   | 'Binding'          // Parameter binding
   | 'ItemFlowConnection' // Connection between item flows
   | 'Satisfy'          // Requirement satisfaction
-  | 'Verify';          // Requirement verification
+  | 'Verify'           // Requirement verification
+  | 'Allocate';        // Allocation relationship
 
 // Basic Element interface - common to all KerML and SysML elements
 export interface Element {
@@ -79,7 +83,14 @@ export interface Relationship {
   sourceId: string;
   targetId: string;
   name?: string;
+  description?: string;  // Added description field
+  label?: string;        // Added label field for diagram display
   points?: Position[];
+  properties?: {         // Added properties field
+    lineStyle?: 'solid' | 'dashed' | 'dotted';
+    lineColor?: string;
+    lineWidth?: number;
+  };
 }
 
 // Diagram representation
