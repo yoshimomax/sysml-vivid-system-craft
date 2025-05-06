@@ -1,17 +1,16 @@
 
-import { useState, useCallback } from "react";
-import { Position } from "../model/types";
+import { useState, useCallback, useEffect } from "react";
 import { diagramEngine } from "../core/DiagramEngine";
-import { useModelingStore } from "../store";
 import { useElementDrag } from "./useElementDrag";
 import { useMultiSelect } from "./useMultiSelect";
 import { useRelationshipCreation } from "./useRelationshipCreation";
+import { useContextMenu } from "./useContextMenu";
+import { useCanvasEvents } from "./useCanvasEvents";
 
+/**
+ * Main hook that combines all canvas interaction hooks
+ */
 export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>) => {
-  // Context menu state
-  const [contextMenuPosition, setContextMenuPosition] = useState<Position | null>(null);
-  const [elementForContextMenu, setElementForContextMenu] = useState<string | null>(null);
-  
   // Get hooks
   const {
     isDragging,
@@ -42,6 +41,25 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
     setSelectedElementIds
   } = useMultiSelect(canvasRef);
   
+  const {
+    contextMenuPosition,
+    elementForContextMenu,
+    setContextMenuPosition,
+    setElementForContextMenu,
+    handleCanvasContextMenu,
+    handleElementContextMenu
+  } = useContextMenu();
+  
+  const {
+    handleCanvasClick: baseHandleCanvasClick,
+    handleRelationshipClick
+  } = useCanvasEvents(
+    isSelecting,
+    isDragging,
+    isCreatingRelationship,
+    cancelRelationshipCreation
+  );
+  
   // Update store when local selection changes
   const updateStoreSelection = useCallback(() => {
     if (localSelectedIds.length > 0) {
@@ -49,61 +67,10 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
     }
   }, [localSelectedIds]);
   
-  // Handle canvas click
+  // Wrap the base handle canvas click to provide the canvas ref
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    console.log("Canvas click", e.target, canvasRef.current);
-    
-    // Only process if target is the canvas or a direct canvas child (grid, etc)
-    const isCanvas = 
-      e.target === canvasRef.current || 
-      e.target === canvasRef.current?.firstChild ||
-      (e.target as Element)?.closest('.canvas-wrapper');
-    
-    // If this is the end of a selection or drag, don't reset the selection
-    if (isSelecting || isDragging) {
-      console.log("Skipping deselection during selection/drag");
-      return;
-    }
-    
-    if (isCanvas) {
-      // If relationship creation is in progress, cancel it
-      if (isCreatingRelationship) {
-        cancelRelationshipCreation();
-        return;
-      }
-      
-      // Only deselect when specifically clicking on empty canvas
-      // and not at the end of a drag or selection operation
-      const isGridLayerClick = (e.target as Element)?.closest('.grid-layer');
-      if (isGridLayerClick) {
-        console.log("Deselecting all elements on grid layer click");
-        diagramEngine.selectElement(null);
-        diagramEngine.selectRelationship(null);
-        diagramEngine.selectMultipleElements([]);
-      }
-    }
-  }, [canvasRef, isCreatingRelationship, cancelRelationshipCreation, isSelecting, isDragging]);
-  
-  // Handle canvas context menu
-  const handleCanvasContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setContextMenuPosition({ x: e.clientX, y: e.clientY });
-    setElementForContextMenu(null);
-  }, []);
-  
-  // Handle element context menu for relationship creation
-  const handleElementContextMenu = useCallback((e: React.MouseEvent, elementId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setContextMenuPosition({ x: e.clientX, y: e.clientY });
-    setElementForContextMenu(elementId);
-  }, []);
-  
-  // Handle relationship click
-  const handleRelationshipClick = useCallback((e: React.MouseEvent, relationshipId: string) => {
-    e.stopPropagation();
-    diagramEngine.selectRelationship(relationshipId);
-  }, []);
+    baseHandleCanvasClick(e, canvasRef);
+  }, [baseHandleCanvasClick, canvasRef]);
   
   // Handle relationship type selection
   const handleRelationshipTypeSelect = useCallback((type: any) => {
@@ -112,7 +79,7 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
     }
     setContextMenuPosition(null);
     setElementForContextMenu(null);
-  }, [elementForContextMenu, startRelationship]);
+  }, [elementForContextMenu, startRelationship, setContextMenuPosition, setElementForContextMenu]);
   
   // Combined mouse move handler
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
