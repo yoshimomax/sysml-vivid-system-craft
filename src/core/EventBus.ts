@@ -36,8 +36,5 @@ export const DiagramEvents = {
   RELATIONSHIP_DELETED: 'relationship:deleted'
 };
 
-// Export extended version of DiagramEvents from here as well for compatibility
-export const DiagramEventsExtended = {
-  ...DiagramEvents,
-  MULTIPLE_ELEMENTS_SELECTED: 'elements:selected'
-};
+// Export DiagramEventsExtended from modelingStore.ts only
+// Remove duplicate declaration here

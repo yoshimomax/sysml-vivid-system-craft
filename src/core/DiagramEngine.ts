@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useModelingStore } from "../store/modelingStore";
 import { Element, Relationship, ElementType, RelationshipType, Position } from "../model/types";
 import { eventBus, DiagramEvents } from './EventBus';
+import { DiagramEventsExtended } from '../store/modelingStore';
 
 /**
  * Create a new element
