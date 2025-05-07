@@ -1,7 +1,7 @@
 
 import React from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { diagramEngine } from "../../core/DiagramEngine";
+import { diagramEngine } from "../../core/diagram"; // Updated import path
 import { ElementType } from "../../model/types";
 
 interface DropLayerProps {

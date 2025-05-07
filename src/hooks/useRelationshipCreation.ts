@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Position, RelationshipType } from "../model/types";
 import { useModelingStore } from "../store/modelingStore";
-import { diagramEngine } from "../core/DiagramEngine";
+import { diagramEngine } from "../core/diagram";
 
 export const useRelationshipCreation = () => {
   const [tempEndPoint, setTempEndPoint] = useState<Position | null>(null);

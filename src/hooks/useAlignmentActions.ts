@@ -1,7 +1,6 @@
-
 import { useCallback } from "react";
 import { useModelingStore } from "../store/modelingStore";
-import { diagramEngine } from "../core/DiagramEngine";
+import { diagramEngine } from "../core/diagram";
 
 export const useAlignmentActions = () => {
   const selectedElementIds = useModelingStore(state => state.selectedElementIds);
