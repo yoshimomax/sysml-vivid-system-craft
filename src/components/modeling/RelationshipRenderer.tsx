@@ -1,6 +1,7 @@
 
 import { Element, Position, Relationship, RelationshipType } from "@/types/sysml";
 import { calculateConnectionPoints } from "@/utils/elementUtils";
+import { TemporaryRelationship } from "./TemporaryRelationship";
 import { useEffect } from "react";
 
 interface RelationshipRendererProps {
@@ -65,17 +66,6 @@ export const RelationshipRenderer = ({
         return "url(#arrow)";
     }
   };
-  
-  // Helper to get element center
-  const getElementCenter = (elementId: string): Position => {
-    const element = elementArray.find(el => el.id === elementId);
-    if (!element) return { x: 0, y: 0 };
-    
-    return {
-      x: element.position.x + element.size.width / 2,
-      y: element.position.y + element.size.height / 2
-    };
-  };
 
   return (
     <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -133,16 +123,13 @@ export const RelationshipRenderer = ({
         ))}
       </g>
       
-      {/* Temporary line for relationship creation */}
+      {/* Temporary line for relationship creation using the new component */}
       {tempRelationship.sourceId && tempRelationship.tempEndPoint && (
-        <path
-          className="relationship-path-temp"
-          d={`M ${getElementCenter(tempRelationship.sourceId).x} ${getElementCenter(tempRelationship.sourceId).y} L ${tempRelationship.tempEndPoint.x} ${tempRelationship.tempEndPoint.y}`}
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeDasharray="5,5"
-          fill="none"
-          markerEnd={getMarkerEnd(tempRelationship.type)}
+        <TemporaryRelationship
+          sourceId={tempRelationship.sourceId}
+          tempEndPoint={tempRelationship.tempEndPoint}
+          type={tempRelationship.type}
+          elements={elementArray}
         />
       )}
     </svg>

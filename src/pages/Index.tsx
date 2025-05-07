@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ModelingHeader from "@/components/ModelingHeader";
 import DiagramTabs from "@/components/DiagramTabs";
 import { ElementsPanel } from "@/components/panels/ElementsPanel";
-import { ModelingCanvas } from "@/components/canvas/ModelingCanvas"; // Ensure we're using the advanced one
+import { ModelingCanvas } from "@/components/canvas/ModelingCanvas"; // Make sure this path is correct
 import PropertiesPanel from "@/components/PropertiesPanel";
 import { useModelingStore } from "@/store/modelingStore";
 import { Element, Relationship } from "@/model/types"; // Changed from types/sysml to model/types

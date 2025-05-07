@@ -1,12 +1,9 @@
 
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { Element, Relationship } from "@/types/sysml";
-import { ElementRenderer } from "./modeling/ElementRenderer";
-import { RelationshipRenderer } from "./modeling/RelationshipRenderer";
 import { useElementDragging } from "@/hooks/useElementDragging";
 import { useRelationshipCreation } from "@/hooks/useRelationshipCreation";
-import { ElementDropHandler } from "./modeling/ElementDropHandler";
-import "../styles/modeling.css";
+import { CanvasContainer } from "./CanvasContainer";
 
 interface ModelingCanvasProps {
   elements: Element[];
@@ -31,33 +28,27 @@ const ModelingCanvas = ({
 }: ModelingCanvasProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   
-  // Make sure elements and relationships are arrays
-  const elementArray = Array.isArray(elements) ? elements : [];
-  const relationshipArray = Array.isArray(relationships) ? relationships : [];
-  
-  console.log("ModelingCanvas rendering with elements:", elementArray);
-  
   // Use the element dragging hook
   const { isDragging, startDragging, handleDragging, stopDragging } = useElementDragging({
-    elements: elementArray,
+    elements: elements,
     setElements
   });
   
-  // Use the relationship creation hook - we'll adapt to its interface
+  // Use the relationship creation hook
   const { 
     isCreatingRelationship,
-    relationshipSourceId,  // Changed from relationshipSource
+    relationshipSourceId,
     relationshipType,
     tempEndPoint,
     startRelationship,
-    handleMouseMove: handleRelationshipMouseMove, // Use the hook's handleMouseMove
-    cancelRelationshipCreation, // Use instead of resetRelationshipCreation
-    completeRelationship  // Use instead of createRelationship
+    handleMouseMove: handleRelationshipMouseMove,
+    cancelRelationshipCreation,
+    completeRelationship
   } = useRelationshipCreation();
 
   useEffect(() => {
-    console.log("Elements in ModelingCanvas updated:", elementArray);
-  }, [elementArray]);
+    console.log("Elements in ModelingCanvas updated:", elements);
+  }, [elements]);
 
   const handleElementMouseDown = (e: React.MouseEvent, element: Element) => {
     e.stopPropagation();
@@ -66,8 +57,8 @@ const ModelingCanvas = ({
     if (isCreatingRelationship) {
       e.preventDefault();
       // If we already have a source, this is the target
-      if (relationshipSourceId) {  // Changed from relationshipSource
-        completeRelationship(element.id);  // Changed from createRelationship
+      if (relationshipSourceId) {
+        completeRelationship(element.id);
       }
       return;
     }
@@ -80,7 +71,7 @@ const ModelingCanvas = ({
   const handleCanvasClick = (e: React.MouseEvent) => {
     // If we're creating a relationship but clicked on the canvas, cancel the operation
     if (isCreatingRelationship && e.target === canvasRef.current) {
-      cancelRelationshipCreation();  // Changed from resetRelationshipCreation
+      cancelRelationshipCreation();
       return;
     }
     
@@ -109,7 +100,7 @@ const ModelingCanvas = ({
   const handleMouseMove = (e: React.MouseEvent) => {
     // Handle relationship creation mouse move
     if (isCreatingRelationship) {
-      handleRelationshipMouseMove(e, canvasRef);  // Changed from handleCanvasMouseMove
+      handleRelationshipMouseMove(e, canvasRef);
       return;
     }
     
@@ -131,42 +122,21 @@ const ModelingCanvas = ({
   };
 
   return (
-    <div
-      ref={canvasRef}
-      className="canvas-wrapper w-full h-full overflow-auto relative"
+    <CanvasContainer
+      canvasRef={canvasRef}
+      elements={elements}
+      relationships={relationships}
+      selectedElement={selectedElement}
+      selectedRelationship={selectedRelationship}
+      onElementMouseDown={handleElementMouseDown}
+      onElementContextMenu={handleElementContextMenu}
+      onRelationshipClick={handleRelationshipClick}
+      onElementDrop={handleElementDrop}
+      onCanvasClick={handleCanvasClick}
       onMouseMove={handleMouseMove}
       onMouseUp={stopDragging}
       onMouseLeave={stopDragging}
-      onClick={handleCanvasClick}
-    >
-      <ElementDropHandler 
-        onElementDrop={handleElementDrop} 
-        canvasRef={canvasRef}
-      >
-        <div className="absolute inset-0">
-          <RelationshipRenderer
-            relationships={relationshipArray}
-            elements={elementArray}
-            tempRelationship={{
-              sourceId: relationshipSourceId,  // Changed from relationshipSource
-              tempEndPoint,
-              type: relationshipType as any  // Added type assertion to fix RelationshipType error
-            }}
-            selectedRelationship={selectedRelationship}
-            onRelationshipClick={handleRelationshipClick}
-          />
-          
-          {elementArray.length > 0 && (
-            <ElementRenderer
-              elements={elementArray}
-              selectedElement={selectedElement}
-              onElementMouseDown={handleElementMouseDown}
-              onElementContextMenu={handleElementContextMenu}
-            />
-          )}
-        </div>
-      </ElementDropHandler>
-    </div>
+    />
   );
 };
 
