@@ -2,7 +2,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useModelingStore } from "../store/modelingStore";
 import { Element, Relationship, ElementType, RelationshipType, Position } from "../model/types";
-import { eventBus, DiagramEvents } from './EventBus';
+import { eventBus } from './EventBus';
+import { DiagramEvents } from './EventBus';
 import { DiagramEventsExtended } from '../store/modelingStore';
 
 /**
@@ -26,7 +27,7 @@ function createElement(type: ElementType, position: Position, size?: { width: nu
     properties: properties || {}
   };
   
-  state.addElement(activeDiagramId, newElement);
+  state.addElement(newElement);
   eventBus.publish(DiagramEvents.ELEMENT_ADDED, newElement);
   
   return newElement;
@@ -59,7 +60,7 @@ function createRelationship(
     waypoints: waypoints || []
   };
   
-  state.addRelationship(activeDiagramId, newRelationship);
+  state.addRelationship(newRelationship);
   eventBus.publish(DiagramEvents.RELATIONSHIP_ADDED, newRelationship);
   
   return newRelationship;
@@ -111,13 +112,13 @@ function deleteElement(elementId: string) {
     );
     
     relatedRelationships.forEach(rel => {
-      state.removeRelationship(activeDiagramId, rel.id);
+      state.removeRelationship(rel.id);
       eventBus.publish(DiagramEvents.RELATIONSHIP_REMOVED, rel.id);
     });
   }
   
   // Then delete the element itself
-  state.removeElement(activeDiagramId, elementId);
+  state.removeElement(elementId);
   eventBus.publish(DiagramEvents.ELEMENT_REMOVED, elementId);
   
   // Clear selection if this was the selected element
@@ -138,7 +139,7 @@ function deleteRelationship(relationshipId: string) {
     return;
   }
   
-  state.removeRelationship(activeDiagramId, relationshipId);
+  state.removeRelationship(relationshipId);
   eventBus.publish(DiagramEvents.RELATIONSHIP_REMOVED, relationshipId);
   
   // Clear selection if this was the selected relationship
@@ -337,3 +338,4 @@ export const diagramEngine = {
   completeRelationshipCreation,
   cancelRelationshipCreation
 };
+
