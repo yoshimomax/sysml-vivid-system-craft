@@ -1,8 +1,7 @@
-
 import { StateCreator } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { ModelingState, RelationshipState } from '../types/storeTypes';
-import { eventBus, DiagramEventsExtended } from '../../core/EventBus';
+import { eventBus, DiagramEvents } from '../../core/EventBus';
 import { RelationshipType } from '../../model/types';
 
 // Relationship state slice
@@ -65,7 +64,7 @@ export const createRelationshipSlice: StateCreator<
       relationshipType: null
     });
     
-    eventBus.publish(DiagramEventsExtended.RELATIONSHIP_ADDED, relationship);
+    eventBus.publish(DiagramEvents.RELATIONSHIP_ADDED, relationship);
   },
   
   addRelationship: (relationship) => {
@@ -92,7 +91,7 @@ export const createRelationshipSlice: StateCreator<
       };
     });
     
-    eventBus.publish(DiagramEventsExtended.RELATIONSHIP_ADDED, relationship);
+    eventBus.publish(DiagramEvents.RELATIONSHIP_ADDED, relationship);
   },
   
   updateRelationship: (id, updates) => {
@@ -107,7 +106,7 @@ export const createRelationshipSlice: StateCreator<
             relationships: d.relationships.map(rel => {
               if (rel.id === id) {
                 const updatedRelationship = { ...rel, ...updates };
-                eventBus.publish(DiagramEventsExtended.RELATIONSHIP_UPDATED, updatedRelationship);
+                eventBus.publish(DiagramEvents.RELATIONSHIP_UPDATED, updatedRelationship);
                 return updatedRelationship;
               }
               return rel;
@@ -150,6 +149,6 @@ export const createRelationshipSlice: StateCreator<
       };
     });
     
-    eventBus.publish(DiagramEventsExtended.RELATIONSHIP_REMOVED, id);
+    eventBus.publish(DiagramEvents.RELATIONSHIP_REMOVED, id);
   }
 });

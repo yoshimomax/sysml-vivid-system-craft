@@ -166,7 +166,7 @@ function selectMultipleElements(elementIds: string[]) {
   state.selectMultipleElements(elementIds);
   
   if (elementIds.length > 0) {
-    eventBus.publish(DiagramEvents.ELEMENT_SELECTED, elementIds);
+    eventBus.publish(DiagramEventsExtended.MULTIPLE_ELEMENTS_SELECTED, elementIds);
   }
 }
 
