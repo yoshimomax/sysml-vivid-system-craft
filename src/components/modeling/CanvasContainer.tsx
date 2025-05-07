@@ -1,10 +1,9 @@
 
-import React, { useRef } from "react";
-import { useElementDragging } from "@/hooks/useElementDragging";
-import { useRelationshipCreation } from "@/hooks/useRelationshipCreation";
+import React from "react";
 import { ElementRenderer } from "./ElementRenderer";
 import { RelationshipRenderer } from "./RelationshipRenderer";
 import { ElementDropHandler } from "./ElementDropHandler";
+import { TemporaryRelationship } from "./TemporaryRelationship";
 
 interface CanvasContainerProps {
   canvasRef: React.RefObject<HTMLDivElement>;

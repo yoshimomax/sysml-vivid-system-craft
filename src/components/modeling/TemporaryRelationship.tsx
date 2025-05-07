@@ -36,6 +36,12 @@ export const TemporaryRelationship: React.FC<TemporaryRelationshipProps> = ({
         return "url(#diamond)";
       case "Reference":
         return "url(#arrow)";
+      case "Satisfy":
+        return "url(#satisfy)";
+      case "Verify":
+        return "url(#verify)";
+      case "Allocate":
+        return "url(#allocate)";
       default:
         return "url(#arrow)";
     }
@@ -45,7 +51,7 @@ export const TemporaryRelationship: React.FC<TemporaryRelationshipProps> = ({
     <path
       className="relationship-path-temp"
       d={`M ${sourceCenter.x} ${sourceCenter.y} L ${tempEndPoint.x} ${tempEndPoint.y}`}
-      stroke="currentColor"
+      stroke="var(--color-temp-relationship)"
       strokeWidth="1.5"
       strokeDasharray="5,5"
       fill="none"
