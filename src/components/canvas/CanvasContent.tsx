@@ -3,6 +3,7 @@ import React from "react";
 import { GridLayer } from "./GridLayer";
 import { ElementLayer } from "./ElementLayer";
 import { RelationshipLayer } from "./RelationshipLayer";
+import { Position } from "../../model/types";
 
 interface CanvasContentProps {
   scale: number;
@@ -16,7 +17,7 @@ interface CanvasContentProps {
   } | null;
   tempRelationship: {
     sourceId: string | null;
-    tempEndPoint: any;
+    tempEndPoint: Position | null;
     type: string | null;
   };
   onElementMouseDown: (e: React.MouseEvent, elementId: string) => void;
@@ -43,7 +44,7 @@ export const CanvasContent: React.FC<CanvasContentProps> = ({
         transformOrigin: '0 0'
       }}
     >
-      {/* Grid background layer */}
+      {/* Grid background layer (now without grid) */}
       <GridLayer className="pointer-events-none" />
       
       {/* Relationships layer */}

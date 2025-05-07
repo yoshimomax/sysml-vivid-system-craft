@@ -44,7 +44,8 @@ export const useElementSelection = () => {
     }
     
     const elements = getElements();
-    console.log("Found elements for selection:", elements.length);
+    console.log("Finding elements in selection area:", { left, top, right, bottom });
+    console.log("Total elements to check:", elements.length);
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
@@ -59,30 +60,29 @@ export const useElementSelection = () => {
         elementBottom > top
       );
       
-      console.log(`Element ${element.id} intersects: ${intersects}`, {
-        elementPos: element.position,
-        elementSize: element.size,
-        selectionBox: { left, top, right, bottom }
-      });
+      console.log(`Element ${element.id} at (${element.position.x},${element.position.y}) intersects: ${intersects}`);
       
       return intersects;
     });
     
-    console.log("Selected elements:", selected.length);
+    console.log("Selected elements:", selected.length, selected.map(el => el.id));
     const selectedIds = selected.map(el => el.id);
     
     if (selectedIds.length > 0) {
       // If shift is held, append to current selection, otherwise replace
+      let newSelection: string[];
       if (shiftKey) {
+        // Add new elements without duplicates
         const currentIds = [...selectedElementIds];
         const newIds = selectedIds.filter(id => !currentIds.includes(id));
-        setSelectedElementIds([...currentIds, ...newIds]);
-        diagramEngine.selectMultipleElements([...currentIds, ...newIds]);
+        newSelection = [...currentIds, ...newIds];
       } else {
-        setSelectedElementIds(selectedIds);
-        diagramEngine.selectMultipleElements(selectedIds);
+        newSelection = selectedIds;
       }
       
+      console.log("Setting selection to:", newSelection);
+      setSelectedElementIds(newSelection);
+      diagramEngine.selectMultipleElements(newSelection);
       return selectedIds;
     }
     

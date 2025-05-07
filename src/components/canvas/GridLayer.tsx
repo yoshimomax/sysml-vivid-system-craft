@@ -8,11 +8,11 @@ interface GridLayerProps {
 export const GridLayer: React.FC<GridLayerProps> = ({ className }) => {
   return (
     <div 
-      className={`absolute inset-0 ${className || ''}`}
+      className={`grid-layer absolute inset-0 ${className || ''}`}
       style={{
-        backgroundColor: 'var(--canvas-bg)',
-        '--canvas-bg': 'hsl(var(--canvas-bg))'
-      } as React.CSSProperties}
+        backgroundColor: 'var(--canvas-bg, hsl(0, 0%, 100%))'
+        // グリッドパターンを削除
+      }}
     />
   );
 };

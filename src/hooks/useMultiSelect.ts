@@ -38,7 +38,9 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     
     // Check if shift key is pressed for additive selection
     const shiftKey = e?.shiftKey || false;
-    findElementsInSelection(normalizedBox, shiftKey);
+    const selectedIds = findElementsInSelection(normalizedBox, shiftKey);
+    console.log("Selected element IDs:", selectedIds);
+    
     resetSelection();
   }, [isSelecting, selectionBox, getNormalizedSelectionBox, findElementsInSelection, resetSelection]);
   

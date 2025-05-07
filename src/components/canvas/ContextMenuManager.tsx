@@ -18,12 +18,26 @@ export const ContextMenuManager: React.FC<ContextMenuManagerProps> = ({
 }) => {
   if (!contextMenuPosition || !elementForContextMenu) return null;
   
+  // ホイールスクロールイベントの伝播を停止するハンドラー
+  const handleWheel = (e: React.WheelEvent) => {
+    e.stopPropagation();
+  };
+  
   return (
-    <RelationshipCreator
-      visible={true}
-      position={contextMenuPosition}
-      onSelectType={onSelectRelationshipType}
-      onCancel={onCancel}
-    />
+    <div 
+      className="absolute z-50 pointer-events-auto relationship-context-menu" 
+      style={{ 
+        left: `${contextMenuPosition.x}px`, 
+        top: `${contextMenuPosition.y}px` 
+      }}
+      onWheel={handleWheel}
+    >
+      <RelationshipCreator
+        visible={true}
+        position={contextMenuPosition}
+        onSelectType={onSelectRelationshipType}
+        onCancel={onCancel}
+      />
+    </div>
   );
 };

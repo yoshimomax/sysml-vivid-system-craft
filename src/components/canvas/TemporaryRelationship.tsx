@@ -15,10 +15,18 @@ export const TemporaryRelationship: React.FC<TemporaryRelationshipProps> = ({
   type,
   elements
 }) => {
-  if (!sourceId || !tempEndPoint || !type) return null;
+  if (!sourceId || !tempEndPoint || !type) {
+    console.debug("Missing data for temporary relationship:", { sourceId, tempEndPoint, type });
+    return null;
+  }
   
   const source = elements.find(el => el.id === sourceId);
-  if (!source) return null;
+  if (!source) {
+    console.debug("Source element not found:", sourceId);
+    return null;
+  }
+  
+  console.log("Drawing temporary relationship line from", source.id, "to", tempEndPoint);
   
   const sourceCenter = {
     x: source.position.x + source.size.width / 2,
@@ -51,7 +59,7 @@ export const TemporaryRelationship: React.FC<TemporaryRelationshipProps> = ({
     <path
       className="relationship-path-temp"
       d={`M ${sourceCenter.x} ${sourceCenter.y} L ${tempEndPoint.x} ${tempEndPoint.y}`}
-      stroke="var(--color-temp-relationship)"
+      stroke="var(--color-temp-relationship, #0088ff)"
       strokeWidth="1.5"
       strokeDasharray="5,5"
       fill="none"
