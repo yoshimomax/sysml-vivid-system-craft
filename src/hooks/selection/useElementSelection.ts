@@ -40,7 +40,7 @@ export const useElementSelection = () => {
     // Selection too small - could be a click - use smaller threshold
     if (Math.abs(right - left) < 2 && Math.abs(bottom - top) < 2) {
       console.log("Selection too small, treating as click");
-      return null;
+      return [];
     }
     
     const elements = getElements();
@@ -82,12 +82,13 @@ export const useElementSelection = () => {
       
       console.log("Setting selection to:", newSelection);
       setSelectedElementIds(newSelection);
+      // 重要: ここで複数選択を適用
       diagramEngine.selectMultipleElements(newSelection);
       return selectedIds;
     }
     
     // If no elements were found and we're not using shift key, clear selection
-    if (!shiftKey && !selectedIds.length) {
+    if (!shiftKey && selectedIds.length === 0) {
       diagramEngine.selectElement(null);
       diagramEngine.selectMultipleElements([]);
       setSelectedElementIds([]);

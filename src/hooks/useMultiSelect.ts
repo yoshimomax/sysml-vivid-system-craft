@@ -41,6 +41,11 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     const selectedIds = findElementsInSelection(normalizedBox, shiftKey);
     console.log("Selected element IDs:", selectedIds);
     
+    // 重要：ここで選択を確定させる
+    if (selectedIds && selectedIds.length > 0) {
+      console.log("Confirmed multi-selection with IDs:", selectedIds);
+    }
+    
     resetSelection();
   }, [isSelecting, selectionBox, getNormalizedSelectionBox, findElementsInSelection, resetSelection]);
   

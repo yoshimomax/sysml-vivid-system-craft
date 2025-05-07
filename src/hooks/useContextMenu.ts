@@ -13,13 +13,8 @@ export const useContextMenu = () => {
   const handleCanvasContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     
-    // Get the canvas-relative position
-    const targetElement = e.currentTarget as HTMLElement;
-    const rect = targetElement.getBoundingClientRect();
-    const x = e.clientX - rect.left + (targetElement.scrollLeft || 0);
-    const y = e.clientY - rect.top + (targetElement.scrollTop || 0);
-    
-    setContextMenuPosition({ x, y });
+    // カーソル位置に合わせる
+    setContextMenuPosition({ x: e.clientX, y: e.clientY });
     setElementForContextMenu(null);
   }, []);
   
@@ -28,19 +23,8 @@ export const useContextMenu = () => {
     e.preventDefault();
     e.stopPropagation();
     
-    // Get the canvas-relative position
-    const canvasElement = (e.currentTarget as HTMLElement).closest('.canvas-wrapper') as HTMLElement;
-    if (canvasElement) {
-      const rect = canvasElement.getBoundingClientRect();
-      const x = e.clientX - rect.left + (canvasElement.scrollLeft || 0);
-      const y = e.clientY - rect.top + (canvasElement.scrollTop || 0);
-      
-      setContextMenuPosition({ x, y });
-    } else {
-      // Fallback if canvas wrapper not found
-      setContextMenuPosition({ x: e.clientX, y: e.clientY });
-    }
-    
+    // カーソル位置に合わせる
+    setContextMenuPosition({ x: e.clientX, y: e.clientY });
     setElementForContextMenu(elementId);
   }, []);
   
