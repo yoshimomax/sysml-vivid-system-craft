@@ -1,7 +1,8 @@
 
 import { StateCreator } from 'zustand';
 import { ModelingState, SelectionState } from '../types/storeTypes';
-import { eventBus, DiagramEventsExtended } from '../../core/EventBus';
+import { eventBus } from '../../core/EventBus';
+import { DiagramEventsExtended } from '../modelingStore';
 
 // Selection state slice
 export const createSelectionSlice: StateCreator<

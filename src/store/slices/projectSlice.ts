@@ -2,7 +2,8 @@
 import { StateCreator } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { ModelingState, ProjectState } from '../types/storeTypes';
-import { eventBus, DiagramEventsExtended } from '../../core/EventBus';
+import { eventBus } from '../../core/EventBus';
+import { DiagramEventsExtended } from '../modelingStore';
 
 // Project state slice
 export const createProjectSlice: StateCreator<
