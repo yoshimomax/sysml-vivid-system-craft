@@ -1,6 +1,6 @@
 
 import { useCallback } from "react";
-import { diagramEngine } from "../core/DiagramEngine";
+import { diagramEngine } from "../core/diagram";
 
 /**
  * Hook for handling canvas click events and selections

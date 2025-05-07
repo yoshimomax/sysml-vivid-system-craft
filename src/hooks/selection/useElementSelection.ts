@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from "react";
-import { diagramEngine } from "../../core/DiagramEngine";
+import { diagramEngine } from "../../core/diagram";
 import { useModelingStore } from "../../store";
 import { Element } from "../../model/types";
 

@@ -1,5 +1,6 @@
+
 import { useState, useCallback, useEffect } from "react";
-import { diagramEngine } from "../core/diagram"; // Updated import path
+import { diagramEngine } from "../core/diagram";
 import { useElementDrag } from "./useElementDrag";
 import { useElementResize } from "./useElementResize";
 import { useMultiSelect } from "./useMultiSelect";

@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from "react";
 import { Position } from "../model/types";
-import { diagramEngine } from "../core/DiagramEngine";
+import { diagramEngine } from "../core/diagram";
 import { useModelingStore } from "../store";
 
 export const useElementDrag = () => {
