@@ -87,10 +87,10 @@ export const ModelingCanvas: React.FC = () => {
         ref={canvasRef}
         className="canvas-wrapper flex-1 overflow-auto relative"
         onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleMouseMove}
+        onMouseMove={(e) => handleMouseMove(e, canvasRef)}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
-        onClick={handleCanvasClick}
+        onClick={(e) => handleCanvasClick(e)}
         onContextMenu={handleCanvasContextMenu}
         onWheel={handleWheel}
       >
@@ -132,7 +132,7 @@ export const ModelingCanvas: React.FC = () => {
               tempEndPoint,
               type: relationshipType
             }}
-            onElementMouseDown={handleElementMouseDown}
+            onElementMouseDown={(e, elementId) => handleElementMouseDown(e, elementId, canvasRef)}
             onElementContextMenu={handleElementContextMenu}
             onRelationshipClick={handleRelationshipClick}
           />
