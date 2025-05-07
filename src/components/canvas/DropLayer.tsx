@@ -1,7 +1,7 @@
 
 import React from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { diagramEngine } from "../../core/diagram"; // Updated import path
+import { diagramEngine } from "../../core/diagram"; 
 import { ElementType } from "../../model/types";
 
 interface DropLayerProps {
@@ -13,7 +13,9 @@ export const DropLayer: React.FC<DropLayerProps> = ({ canvasRef, children }) => 
   // Handle element drop
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const elementType = e.dataTransfer.getData("elementType") as ElementType;
+    
+    // これが修正点です: application/sysml-element キーを使用してデータを取得
+    const elementType = e.dataTransfer.getData("application/sysml-element") as ElementType;
     
     if (!elementType) {
       console.error("No element type provided in drop event");
