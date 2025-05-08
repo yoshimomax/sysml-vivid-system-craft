@@ -69,5 +69,27 @@ export const createSelectionSlice: StateCreator<
       selectedElementIds: []
     });
     eventBus.publish(DiagramEventsExtended.RELATIONSHIP_SELECTED, id);
+  },
+  
+  // Update element size in the store
+  updateElementSize: (elementId, width, height) => {
+    const { getActiveDiagram, updateElement } = get();
+    const diagram = getActiveDiagram();
+    
+    if (!diagram) return;
+    
+    const element = diagram.elements.find(e => e.id === elementId);
+    if (!element) return;
+    
+    // Update the element size
+    const updatedElement = {
+      ...element,
+      size: {
+        width,
+        height
+      }
+    };
+    
+    updateElement(elementId, updatedElement);
   }
 });

@@ -39,22 +39,26 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     
     // Check if shift key is pressed for additive selection
     const shiftKey = e?.shiftKey || false;
+    
+    // Find elements in selection and apply selection immediately
     const selectedIds = findElementsInSelection(normalizedBox, shiftKey);
     console.log("Selected element IDs:", selectedIds);
     
-    // Apply selection to store immediately
+    // Apply selection to store
     if (selectedIds && selectedIds.length > 0) {
-      console.log("Confirmed multi-selection with IDs:", selectedIds);
+      console.log("Applying multi-selection with IDs:", selectedIds);
       // Apply multi-selection to the diagram engine - this will update the store
       diagramEngine.selectMultipleElements(selectedIds);
-    } else if (!shiftKey) {
+    } else if (!shiftKey && selectedElementIds.length > 0 && !e?.ctrlKey) {
       // If no elements were selected and shift key isn't pressed, clear selection
+      // But don't clear if Ctrl is pressed (for additive selection via clicks)
+      console.log("No elements in selection box, clearing selection");
       diagramEngine.selectElement(null);
       diagramEngine.selectMultipleElements([]);
     }
     
     resetSelection();
-  }, [isSelecting, selectionBox, getNormalizedSelectionBox, findElementsInSelection, resetSelection]);
+  }, [isSelecting, selectionBox, getNormalizedSelectionBox, findElementsInSelection, resetSelection, selectedElementIds]);
   
   // Cancel selection without selecting elements
   const cancelSelection = useCallback(() => {

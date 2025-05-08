@@ -49,9 +49,13 @@ export const useElementSelection = () => {
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
+      // If element size is not defined or zero, use a default minimum size
+      const width = element.size.width || 50;
+      const height = element.size.height || 50;
+      
       // Calculate element's bounds
-      const elementRight = element.position.x + element.size.width;
-      const elementBottom = element.position.y + element.size.height;
+      const elementRight = element.position.x + width;
+      const elementBottom = element.position.y + height;
       
       // An element is selected if it's at least partially inside the selection box
       // This uses a proper intersection test between the selection rectangle and the element rectangle
@@ -62,7 +66,7 @@ export const useElementSelection = () => {
         elementBottom > top
       );
       
-      console.log(`Element ${element.id} at (${element.position.x},${element.position.y}) size ${element.size.width}x${element.size.height} intersects: ${intersects}`);
+      console.log(`Element ${element.id} at (${element.position.x},${element.position.y}) size ${width}x${height} intersects: ${intersects}`);
       
       return intersects;
     });
@@ -87,7 +91,7 @@ export const useElementSelection = () => {
     
     // Apply the multi-selection to the diagram engine
     diagramEngine.selectMultipleElements(newSelection);
-    return selectedIds;
+    return newSelection;
   }, [getElements, selectedElementIds]);
   
   return {

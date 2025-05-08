@@ -1,7 +1,8 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Element } from "../../model/types";
 import { ElementCompartments } from "./ElementCompartments";
+import { useModelingStore } from "../../store";
 
 interface ElementRendererProps {
   element: Element;
@@ -16,6 +17,21 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
   onMouseDown,
   onContextMenu
 }) => {
+  const elementRef = useRef<HTMLDivElement>(null);
+  const updateElementSize = useModelingStore(state => state.updateElementSize);
+  
+  // Update element size after it renders
+  useEffect(() => {
+    if (elementRef.current) {
+      const { width, height } = elementRef.current.getBoundingClientRect();
+      if (width > 0 && height > 0 && 
+          (width !== element.size.width || height !== element.size.height)) {
+        console.log(`Updating element ${element.id} size to ${width}x${height}`);
+        updateElementSize(element.id, width, height);
+      }
+    }
+  }, [element.id, element.size.width, element.size.height, updateElementSize]);
+
   // Add styling based on element type
   const getElementClass = () => {
     const baseClass = `absolute element-block element-${element.type.toLowerCase()}`;
@@ -30,6 +46,7 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
 
   return (
     <div
+      ref={elementRef}
       className={getElementClass()}
       style={{
         left: `${element.position.x}px`,
