@@ -78,9 +78,21 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     const right = Math.max(selectionBox.startX, selectionBox.endX) / scale;
     const bottom = Math.max(selectionBox.startY, selectionBox.endY) / scale;
     
-    console.log("Normalized selection box:", { left, top, right, bottom, scale });
+    // Ensure the selection box has minimum dimensions to avoid pixel-perfect selection issues
+    const minSize = 2 / scale;  // Minimum size of 2 pixels
+    const width = right - left;
+    const height = bottom - top;
     
-    return { left, top, right, bottom };
+    const normalizedBox = {
+      left,
+      top,
+      right: width < minSize ? left + minSize : right,
+      bottom: height < minSize ? top + minSize : bottom
+    };
+    
+    console.log("Normalized selection box:", normalizedBox, "Scale:", scale);
+    
+    return normalizedBox;
   }, [selectionBox, scale]);
   
   return {

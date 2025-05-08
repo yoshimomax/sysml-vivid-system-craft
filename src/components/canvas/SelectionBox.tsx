@@ -21,6 +21,9 @@ export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selecti
   const width = Math.abs(selectionBox.endX - selectionBox.startX);
   const height = Math.abs(selectionBox.endY - selectionBox.startY);
 
+  // Only render if the selection has some size
+  if (width < 2 && height < 2) return null;
+
   return (
     <div 
       className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-50"

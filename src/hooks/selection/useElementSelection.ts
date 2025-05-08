@@ -62,7 +62,7 @@ export const useElementSelection = () => {
         elementBottom > top
       );
       
-      console.log(`Element ${element.id} at (${element.position.x},${element.position.y}) intersects: ${intersects}`);
+      console.log(`Element ${element.id} at (${element.position.x},${element.position.y}) size ${element.size.width}x${element.size.height} intersects: ${intersects}`);
       
       return intersects;
     });
