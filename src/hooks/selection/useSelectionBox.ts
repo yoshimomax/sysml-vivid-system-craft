@@ -1,5 +1,5 @@
 
-import { useState, useCallback, RefObject, useRef } from "react";
+import { useState, useCallback, RefObject } from "react";
 import { Position } from "../../model/types";
 import { useModelingStore } from "../../store";
 
@@ -29,9 +29,9 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!rect) return;
     
     // Calculate start position in canvas coordinates (adjusted for scale and scroll)
-    // Using clientX/Y instead of pageX/Y to avoid scroll offset issues
-    const startX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
-    const startY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
+    // IMPORTANT: Using clientX/Y instead of pageX/Y to avoid scroll offset issues
+    const startX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0) / scale;
+    const startY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0) / scale;
     
     console.log("Selection starting at canvas coordinates:", { startX, startY, scale });
     
@@ -51,9 +51,9 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     const rect = canvasRef.current.getBoundingClientRect();
     
     // Calculate end position in canvas coordinates (adjusted for scale and scroll)
-    // Using clientX/Y instead of pageX/Y to avoid scroll offset issues
-    const endX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
-    const endY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
+    // IMPORTANT: Using clientX/Y instead of pageX/Y to avoid scroll offset issues
+    const endX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0) / scale;
+    const endY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0) / scale;
     
     console.log("Selection updating to canvas coordinates:", { endX, endY, scale });
     
@@ -81,7 +81,7 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     const bottom = Math.max(selectionBox.startY, selectionBox.endY);
     
     // Ensure the selection box has minimum dimensions to avoid pixel-perfect selection issues
-    // Let's make the minimum size smaller to catch smaller elements
+    // A smaller minimum size to catch smaller elements
     const minSize = 1;  // Minimum size of 1 pixel
     const width = right - left;
     const height = bottom - top;

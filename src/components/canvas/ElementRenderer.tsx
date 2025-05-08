@@ -18,19 +18,24 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
   onContextMenu
 }) => {
   const elementRef = useRef<HTMLDivElement>(null);
-  const updateElementSize = useModelingStore(state => state.updateElementSize);
+  const updateElement = useModelingStore(state => state.updateElement);
   
   // Update element size after it renders
   useEffect(() => {
     if (elementRef.current) {
       const { width, height } = elementRef.current.getBoundingClientRect();
       if (width > 0 && height > 0 && 
-          (width !== element.size.width || height !== element.size.height)) {
+          (Math.abs(width - element.size.width) > 1 || Math.abs(height - element.size.height) > 1)) {
         console.log(`Updating element ${element.id} size to ${width}x${height}`);
-        updateElementSize(element.id, width, height);
+        updateElement(element.id, { 
+          size: {
+            width, 
+            height
+          }
+        });
       }
     }
-  }, [element, updateElementSize]);
+  }, [element, updateElement]);
 
   // Add styling based on element type
   const getElementClass = () => {

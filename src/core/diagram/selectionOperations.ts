@@ -13,6 +13,9 @@ function selectElement(elementId: string | null) {
   
   if (elementId) {
     eventBus.publish(DiagramEvents.ELEMENT_SELECTED, elementId);
+  } else {
+    // Clear multi-selection when single selection is cleared
+    state.selectMultipleElements([]);
   }
 }
 
@@ -32,6 +35,14 @@ function selectMultipleElements(elementIds: string[]) {
   // Broadcast the selection event if we have selected elements
   if (validIds.length > 0) {
     eventBus.publish(DiagramEventsExtended.MULTIPLE_ELEMENTS_SELECTED, validIds);
+    
+    // If only one element is selected, also set it as the selected element
+    if (validIds.length === 1) {
+      state.selectElement(validIds[0]);
+    } else {
+      // If multiple elements are selected, clear the single selection
+      state.selectElement(null);
+    }
   } else {
     // If no elements are selected, make sure to clear the selection
     state.selectElement(null);
@@ -45,7 +56,10 @@ function selectRelationship(relationshipId: string | null) {
   const state = useModelingStore.getState();
   state.selectRelationship(relationshipId);
   
+  // Clear element selections when selecting a relationship
   if (relationshipId) {
+    state.selectElement(null);
+    state.selectMultipleElements([]);
     eventBus.publish(DiagramEvents.RELATIONSHIP_SELECTED, relationshipId);
   }
 }

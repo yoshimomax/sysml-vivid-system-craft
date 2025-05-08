@@ -27,7 +27,7 @@ export const useElementSelection = () => {
     return () => unsubscribe();
   }, [selectedElementIds]);
   
-  // Find elements within a selection area
+  // Improved intersection detection that properly handles scaling
   const findElementsInSelection = useCallback((selectionArea: { 
     left: number, 
     top: number, 
@@ -44,7 +44,6 @@ export const useElementSelection = () => {
     console.log("Selection dimensions:", { width: selectionWidth, height: selectionHeight });
     
     // If selection is extremely small, it might be a click rather than a drag
-    // But we'll lower the threshold to catch smaller drag selections
     const minSelectionSize = 2;
     
     // Get elements and check for intersection
@@ -64,7 +63,7 @@ export const useElementSelection = () => {
       const elementRight = elementLeft + width;
       const elementBottom = elementTop + height;
       
-      // Debug information
+      // Log element bounds for debugging
       console.log(`Element ${element.id} bounds:`, {
         left: elementLeft,
         top: elementTop,
@@ -93,8 +92,10 @@ export const useElementSelection = () => {
     
     // Always apply the selection if the selection box is large enough
     let newSelection: string[];
+    
+    // For very small selections (likely clicks), keep the current behavior
     if (selectionWidth < minSelectionSize && selectionHeight < minSelectionSize) {
-      // For very small selections (likely clicks), keep the current behavior
+      console.log("Selection too small, treating as click");
       return selectedElementIds;
     }
     
@@ -103,9 +104,11 @@ export const useElementSelection = () => {
       const currentIds = [...selectedElementIds];
       const newIds = selectedIds.filter(id => !currentIds.includes(id));
       newSelection = [...currentIds, ...newIds];
+      console.log("Shift key pressed - adding to selection:", newIds);
     } else {
       // Replace selection when shift is not pressed
       newSelection = selectedIds;
+      console.log("Replacing selection with:", selectedIds);
     }
     
     console.log("Setting selection to:", newSelection);

@@ -39,27 +39,28 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     
     // Check if shift key is pressed for additive selection
     const shiftKey = e?.shiftKey || false;
+    const ctrlKey = e?.ctrlKey || false;  // Support Ctrl key too for selection
     
     // Find elements in selection and apply selection immediately
-    const selectedIds = findElementsInSelection(normalizedBox, shiftKey);
+    const selectedIds = findElementsInSelection(normalizedBox, shiftKey || ctrlKey);
     console.log("Selected element IDs:", selectedIds);
     
     // Apply selection to store if we found elements
     if (selectedIds && selectedIds.length > 0) {
       console.log("Applying multi-selection with IDs:", selectedIds);
-      // Apply multi-selection to the diagram engine - this will update the store
+      // Apply multi-selection to the diagram engine
       diagramEngine.selectMultipleElements(selectedIds);
-    } else if (!shiftKey && selectedElementIds.length > 0 && !e?.ctrlKey) {
+    } else if (!shiftKey && !ctrlKey && selectedElementIds.length > 0) {
       // Clear selection only if:
-      // 1. no elements were selected
-      // 2. shift key isn't pressed
+      // 1. no elements were selected in the box
+      // 2. shift/ctrl key isn't pressed
       // 3. we currently have elements selected
-      // 4. ctrl key isn't pressed
       console.log("No elements in selection box, clearing selection");
       diagramEngine.selectElement(null);
       diagramEngine.selectMultipleElements([]);
     }
     
+    // Always reset the selection box at the end
     resetSelection();
   }, [isSelecting, selectionBox, getNormalizedSelectionBox, findElementsInSelection, resetSelection, selectedElementIds]);
   

@@ -1,3 +1,4 @@
+
 import { useCallback } from "react";
 import { diagramEngine } from "../../core/diagram";
 
@@ -13,7 +14,7 @@ export const useMouseHandlers = (
   handleDrag: (e: React.MouseEvent, canvasRef: React.RefObject<HTMLDivElement>) => void,
   isResizing: boolean,
   handleResize: (e: MouseEvent, elementId: string, canvasRef: React.RefObject<HTMLDivElement>) => void,
-  endSelection: () => void,
+  endSelection: (e?: React.MouseEvent) => void,
   handleDragEnd: () => void,
   endResize: () => void,
   cancelSelection: () => void,
@@ -22,6 +23,30 @@ export const useMouseHandlers = (
   // Combined mouse move handler
   const handleMouseMove = useCallback((e: React.MouseEvent, canvasRef: React.RefObject<HTMLDivElement>) => {
     if (isSelecting) {
+      // Log coordinates for debugging selection issues
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const scale = diagramEngine.getState().scale;
+        const clientX = e.clientX - rect.left;
+        const clientY = e.clientY - rect.top;
+        const canvasX = clientX / scale + (canvasRef.current?.scrollLeft || 0) / scale;
+        const canvasY = clientY / scale + (canvasRef.current?.scrollTop || 0) / scale;
+        
+        console.log("Mouse move coordinates:", {
+          clientX: e.clientX,
+          clientY: e.clientY,
+          canvasClientX: clientX,
+          canvasClientY: clientY,
+          canvasX,
+          canvasY,
+          scale,
+          scroll: {
+            left: canvasRef.current?.scrollLeft || 0,
+            top: canvasRef.current?.scrollTop || 0
+          }
+        });
+      }
+      
       updateSelection(e);
       return;
     }
@@ -46,7 +71,8 @@ export const useMouseHandlers = (
   // Mouse up handler
   const handleMouseUp = useCallback((e: React.MouseEvent) => {
     if (isSelecting) {
-      endSelection();
+      // Pass the event so we can check for modifier keys
+      endSelection(e);
       return;
     }
     
@@ -72,6 +98,14 @@ export const useMouseHandlers = (
     
     if (!isElementClick) {
       e.preventDefault(); // Prevent default to ensure we capture the event
+      
+      // Log coordinates for debugging selection issues
+      console.log("Canvas mouse down:", {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        target: e.target
+      });
+      
       startSelection(e);
     }
   }, [startSelection]);

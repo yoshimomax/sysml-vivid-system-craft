@@ -122,7 +122,8 @@ export const useCanvasInteractions = (canvasRef: React.RefObject<HTMLDivElement>
   
   // Update store when local selection changes
   const updateStoreSelection = useCallback(() => {
-    if (localSelectedIds.length > 0) {
+    if (localSelectedIds && localSelectedIds.length > 0) {
+      console.log("Updating store with selection:", localSelectedIds);
       diagramEngine.selectMultipleElements(localSelectedIds);
     }
   }, [localSelectedIds]);
