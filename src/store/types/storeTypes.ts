@@ -55,6 +55,9 @@ export interface SelectionState {
   selectElement: (id: string | null) => void;
   selectMultipleElements: (ids: string[]) => void;
   selectRelationship: (id: string | null) => void;
+  
+  // Element size update action
+  updateElementSize: (elementId: string, width: number, height: number) => void;
 }
 
 // UI state and actions
