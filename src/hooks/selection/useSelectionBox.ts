@@ -29,8 +29,8 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!rect) return;
     
     // Calculate start position in canvas coordinates
-    const startX = e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0);
-    const startY = e.clientY - rect.top + (canvasRef.current?.scrollTop || 0);
+    const startX = (e.clientX - rect.left) + (canvasRef.current?.scrollLeft || 0);
+    const startY = (e.clientY - rect.top) + (canvasRef.current?.scrollTop || 0);
     
     console.log("Selection starting at:", { startX, startY, scale });
     
@@ -49,8 +49,8 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     
     const rect = canvasRef.current.getBoundingClientRect();
     // Calculate end position in canvas coordinates
-    const endX = e.clientX - rect.left + (canvasRef.current?.scrollLeft || 0);
-    const endY = e.clientY - rect.top + (canvasRef.current?.scrollTop || 0);
+    const endX = (e.clientX - rect.left) + (canvasRef.current?.scrollLeft || 0);
+    const endY = (e.clientY - rect.top) + (canvasRef.current?.scrollTop || 0);
     
     console.log("Selection updating to:", { endX, endY });
     

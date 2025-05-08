@@ -20,6 +20,7 @@ function selectElement(elementId: string | null) {
  * Select multiple elements
  */
 function selectMultipleElements(elementIds: string[]) {
+  console.log("selectionOperations.selectMultipleElements:", elementIds);
   const state = useModelingStore.getState();
   state.selectMultipleElements(elementIds);
   

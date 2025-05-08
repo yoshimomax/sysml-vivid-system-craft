@@ -49,10 +49,12 @@ export const useElementSelection = () => {
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
+      // Calculate element's bounds
       const elementRight = element.position.x + element.size.width;
       const elementBottom = element.position.y + element.size.height;
       
-      // Check if element intersects with the selection box
+      // An element is selected if it's at least partially inside the selection box
+      // This uses a proper intersection test between the selection rectangle and the element rectangle
       const intersects = (
         element.position.x < right &&
         elementRight > left &&
@@ -68,32 +70,23 @@ export const useElementSelection = () => {
     console.log("Selected elements:", selected.length, selected.map(el => el.id));
     const selectedIds = selected.map(el => el.id);
     
-    if (selectedIds.length > 0) {
-      // If shift is held, append to current selection, otherwise replace
-      let newSelection: string[];
-      if (shiftKey) {
-        // Add new elements without duplicates
-        const currentIds = [...selectedElementIds];
-        const newIds = selectedIds.filter(id => !currentIds.includes(id));
-        newSelection = [...currentIds, ...newIds];
-      } else {
-        newSelection = selectedIds;
-      }
-      
-      console.log("Setting selection to:", newSelection);
-      setSelectedElementIds(newSelection);
-      // 重要: ここで複数選択を適用
-      diagramEngine.selectMultipleElements(newSelection);
-      return selectedIds;
+    // Always apply the selection if we found elements, regardless of whether it's empty
+    let newSelection: string[];
+    if (shiftKey && selectedIds.length > 0) {
+      // Add new elements without duplicates when shift is pressed
+      const currentIds = [...selectedElementIds];
+      const newIds = selectedIds.filter(id => !currentIds.includes(id));
+      newSelection = [...currentIds, ...newIds];
+    } else {
+      // Replace selection when shift is not pressed
+      newSelection = selectedIds;
     }
     
-    // If no elements were found and we're not using shift key, clear selection
-    if (!shiftKey && selectedIds.length === 0) {
-      diagramEngine.selectElement(null);
-      diagramEngine.selectMultipleElements([]);
-      setSelectedElementIds([]);
-    }
+    console.log("Setting selection to:", newSelection);
+    setSelectedElementIds(newSelection);
     
+    // Apply the multi-selection to the diagram engine
+    diagramEngine.selectMultipleElements(newSelection);
     return selectedIds;
   }, [getElements, selectedElementIds]);
   

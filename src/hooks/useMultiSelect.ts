@@ -45,7 +45,12 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     // Apply selection to store immediately
     if (selectedIds && selectedIds.length > 0) {
       console.log("Confirmed multi-selection with IDs:", selectedIds);
+      // Apply multi-selection to the diagram engine - this will update the store
       diagramEngine.selectMultipleElements(selectedIds);
+    } else if (!shiftKey) {
+      // If no elements were selected and shift key isn't pressed, clear selection
+      diagramEngine.selectElement(null);
+      diagramEngine.selectMultipleElements([]);
     }
     
     resetSelection();
