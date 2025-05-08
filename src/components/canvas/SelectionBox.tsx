@@ -22,7 +22,7 @@ export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selecti
   const height = Math.abs(selectionBox.endY - selectionBox.startY) * scale;
 
   // Only render if the selection has some size
-  if (width < 2 && height < 2) return null;
+  if (width < 1 && height < 1) return null;
 
   return (
     <div 
@@ -32,6 +32,7 @@ export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selecti
         top: `${top}px`,
         width: `${width}px`,
         height: `${height}px`,
+        userSelect: 'none',
       }}
       data-testid="selection-box"
     />

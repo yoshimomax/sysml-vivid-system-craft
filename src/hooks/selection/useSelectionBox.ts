@@ -29,6 +29,7 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!rect) return;
     
     // Calculate start position in canvas coordinates (adjusted for scale and scroll)
+    // Using clientX/Y instead of pageX/Y to avoid scroll offset issues
     const startX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
     const startY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
     
@@ -50,6 +51,7 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     const rect = canvasRef.current.getBoundingClientRect();
     
     // Calculate end position in canvas coordinates (adjusted for scale and scroll)
+    // Using clientX/Y instead of pageX/Y to avoid scroll offset issues
     const endX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
     const endY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
     
@@ -79,7 +81,8 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     const bottom = Math.max(selectionBox.startY, selectionBox.endY);
     
     // Ensure the selection box has minimum dimensions to avoid pixel-perfect selection issues
-    const minSize = 2;  // Minimum size of 2 pixels
+    // Let's make the minimum size smaller to catch smaller elements
+    const minSize = 1;  // Minimum size of 1 pixel
     const width = right - left;
     const height = bottom - top;
     

@@ -50,8 +50,11 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
       // Apply multi-selection to the diagram engine - this will update the store
       diagramEngine.selectMultipleElements(selectedIds);
     } else if (!shiftKey && selectedElementIds.length > 0 && !e?.ctrlKey) {
-      // If no elements were selected and shift key isn't pressed, clear selection
-      // But don't clear if Ctrl is pressed (for additive selection via clicks)
+      // Clear selection only if:
+      // 1. no elements were selected
+      // 2. shift key isn't pressed
+      // 3. we currently have elements selected
+      // 4. ctrl key isn't pressed
       console.log("No elements in selection box, clearing selection");
       diagramEngine.selectElement(null);
       diagramEngine.selectMultipleElements([]);

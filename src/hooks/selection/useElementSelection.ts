@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from "react";
 import { diagramEngine } from "../../core/diagram";
 import { useModelingStore } from "../../store";
@@ -37,34 +36,43 @@ export const useElementSelection = () => {
   }, shiftKey: boolean) => {
     const { left, top, right, bottom } = selectionArea;
     
-    // Selection too small - could be a click - require larger threshold for drag selection
+    // Selection width and height
     const selectionWidth = Math.abs(right - left);
     const selectionHeight = Math.abs(bottom - top);
     
-    // Require a minimum size for the selection area to consider it a drag selection
-    // This helps distinguish from simple clicks
-    const minSelectionSize = 3;
-    if (selectionWidth < minSelectionSize && selectionHeight < minSelectionSize) {
-      console.log("Selection too small, treating as click");
-      return [];
-    }
-    
-    const elements = getElements();
     console.log("Finding elements in selection area:", { left, top, right, bottom });
+    console.log("Selection dimensions:", { width: selectionWidth, height: selectionHeight });
+    
+    // If selection is extremely small, it might be a click rather than a drag
+    // But we'll lower the threshold to catch smaller drag selections
+    const minSelectionSize = 2;
+    
+    // Get elements and check for intersection
+    const elements = getElements();
     console.log("Total elements to check:", elements.length);
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
       // Get element bounds
       // If element size is not defined or zero, use a default minimum size
-      const width = element.size.width || 50;
-      const height = element.size.height || 50;
+      const width = element.size?.width || 50;
+      const height = element.size?.height || 50;
       
       // Calculate element's bounds
       const elementLeft = element.position.x;
       const elementTop = element.position.y;
       const elementRight = elementLeft + width;
       const elementBottom = elementTop + height;
+      
+      // Debug information
+      console.log(`Element ${element.id} bounds:`, {
+        left: elementLeft,
+        top: elementTop,
+        right: elementRight,
+        bottom: elementBottom,
+        width,
+        height
+      });
       
       // An element is selected if it's at least partially inside the selection box
       // This uses a proper intersection test between the selection rectangle and the element rectangle
@@ -83,8 +91,13 @@ export const useElementSelection = () => {
     console.log("Selected elements:", selected.length, selected.map(el => el.id));
     const selectedIds = selected.map(el => el.id);
     
-    // Always apply the selection if we found elements, regardless of whether it's empty
+    // Always apply the selection if the selection box is large enough
     let newSelection: string[];
+    if (selectionWidth < minSelectionSize && selectionHeight < minSelectionSize) {
+      // For very small selections (likely clicks), keep the current behavior
+      return selectedElementIds;
+    }
+    
     if (shiftKey && selectedIds.length > 0) {
       // Add new elements without duplicates when shift is pressed
       const currentIds = [...selectedElementIds];
