@@ -15,7 +15,7 @@ interface SelectionBoxProps {
 export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selectionBox, scale }) => {
   if (!isSelecting || !selectionBox) return null;
 
-  // Calculate dimensions in screen coordinates (need to multiply by scale for display)
+  // Calculate dimensions in screen coordinates (multiplied by scale for display)
   const left = Math.min(selectionBox.startX, selectionBox.endX) * scale;
   const top = Math.min(selectionBox.startY, selectionBox.endY) * scale;
   const width = Math.abs(selectionBox.endX - selectionBox.startX) * scale;
@@ -26,7 +26,7 @@ export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selecti
 
   return (
     <div 
-      className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-50"
+      className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none z-50 select-none"
       style={{
         left: `${left}px`,
         top: `${top}px`,

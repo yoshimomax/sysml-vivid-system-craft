@@ -22,10 +22,14 @@ function selectElement(elementId: string | null) {
 function selectMultipleElements(elementIds: string[]) {
   console.log("selectionOperations.selectMultipleElements:", elementIds);
   const state = useModelingStore.getState();
-  state.selectMultipleElements(elementIds);
   
-  if (elementIds.length > 0) {
-    eventBus.publish(DiagramEventsExtended.MULTIPLE_ELEMENTS_SELECTED, elementIds);
+  // Make sure we have a valid array of element IDs
+  const validIds = Array.isArray(elementIds) ? elementIds : [];
+  
+  state.selectMultipleElements(validIds);
+  
+  if (validIds.length > 0) {
+    eventBus.publish(DiagramEventsExtended.MULTIPLE_ELEMENTS_SELECTED, validIds);
   }
 }
 

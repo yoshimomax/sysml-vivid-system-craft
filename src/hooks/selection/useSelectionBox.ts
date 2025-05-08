@@ -28,11 +28,11 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
     
-    // Calculate start position in canvas coordinates
+    // Calculate start position in canvas coordinates (adjusted for scale and scroll)
     const startX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
     const startY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
     
-    console.log("Selection starting at:", { startX, startY, scale });
+    console.log("Selection starting at canvas coordinates:", { startX, startY, scale });
     
     setIsSelecting(true);
     setSelectionBox({
@@ -48,11 +48,12 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!isSelecting || !selectionBox || !canvasRef.current) return;
     
     const rect = canvasRef.current.getBoundingClientRect();
-    // Calculate end position in canvas coordinates, adjusted for scale
+    
+    // Calculate end position in canvas coordinates (adjusted for scale and scroll)
     const endX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
     const endY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
     
-    console.log("Selection updating to:", { endX, endY, scale });
+    console.log("Selection updating to canvas coordinates:", { endX, endY, scale });
     
     setSelectionBox({
       ...selectionBox,
@@ -71,8 +72,7 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
   const getNormalizedSelectionBox = useCallback(() => {
     if (!selectionBox) return null;
     
-    // Convert coordinates to the element coordinate system
-    // These values are now in the same coordinate system as the diagram elements
+    // Convert coordinates to the element coordinate system and normalize
     const left = Math.min(selectionBox.startX, selectionBox.endX);
     const top = Math.min(selectionBox.startY, selectionBox.endY);
     const right = Math.max(selectionBox.startX, selectionBox.endX);

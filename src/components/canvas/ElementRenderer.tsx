@@ -18,7 +18,7 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
   onContextMenu
 }) => {
   const elementRef = useRef<HTMLDivElement>(null);
-  const updateElement = useModelingStore(state => state.updateElement);
+  const updateElementSize = useModelingStore(state => state.updateElementSize);
   
   // Update element size after it renders
   useEffect(() => {
@@ -27,13 +27,10 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
       if (width > 0 && height > 0 && 
           (width !== element.size.width || height !== element.size.height)) {
         console.log(`Updating element ${element.id} size to ${width}x${height}`);
-        updateElement(element.id, {
-          ...element,
-          size: { width, height }
-        });
+        updateElementSize(element.id, width, height);
       }
     }
-  }, [element, updateElement]);
+  }, [element, updateElementSize]);
 
   // Add styling based on element type
   const getElementClass = () => {
@@ -57,11 +54,13 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
         width: `${element.size.width}px`,
         height: `${element.size.height}px`,
         zIndex: isSelected ? 10 : 1,
-        pointerEvents: "auto"
+        pointerEvents: "auto",
+        userSelect: "none"
       }}
       data-element-id={element.id}
       data-type={element.type}
       onMouseDown={(e) => {
+        e.preventDefault();
         e.stopPropagation();
         onMouseDown(e);
       }}
