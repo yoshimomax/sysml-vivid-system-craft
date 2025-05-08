@@ -11,7 +11,7 @@ export const GridLayer: React.FC<GridLayerProps> = ({ className }) => {
       className={`grid-layer absolute inset-0 ${className || ''}`}
       style={{
         backgroundColor: 'var(--canvas-bg, hsl(0, 0%, 100%))'
-        // グリッドパターンを完全に削除
+        // Grid pattern completely removed
       }}
     />
   );
