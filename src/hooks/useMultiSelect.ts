@@ -44,7 +44,7 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     const selectedIds = findElementsInSelection(normalizedBox, shiftKey);
     console.log("Selected element IDs:", selectedIds);
     
-    // Apply selection to store
+    // Apply selection to store if we found elements
     if (selectedIds && selectedIds.length > 0) {
       console.log("Applying multi-selection with IDs:", selectedIds);
       // Apply multi-selection to the diagram engine - this will update the store

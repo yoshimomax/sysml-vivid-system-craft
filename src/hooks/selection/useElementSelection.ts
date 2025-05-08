@@ -37,8 +37,14 @@ export const useElementSelection = () => {
   }, shiftKey: boolean) => {
     const { left, top, right, bottom } = selectionArea;
     
-    // Selection too small - could be a click - use smaller threshold
-    if (Math.abs(right - left) < 2 && Math.abs(bottom - top) < 2) {
+    // Selection too small - could be a click - require larger threshold for drag selection
+    const selectionWidth = Math.abs(right - left);
+    const selectionHeight = Math.abs(bottom - top);
+    
+    // Require a minimum size for the selection area to consider it a drag selection
+    // This helps distinguish from simple clicks
+    const minSelectionSize = 3;
+    if (selectionWidth < minSelectionSize && selectionHeight < minSelectionSize) {
       console.log("Selection too small, treating as click");
       return [];
     }
@@ -49,20 +55,23 @@ export const useElementSelection = () => {
     
     // Find elements inside the selection box
     const selected = elements.filter(element => {
+      // Get element bounds
       // If element size is not defined or zero, use a default minimum size
       const width = element.size.width || 50;
       const height = element.size.height || 50;
       
       // Calculate element's bounds
-      const elementRight = element.position.x + width;
-      const elementBottom = element.position.y + height;
+      const elementLeft = element.position.x;
+      const elementTop = element.position.y;
+      const elementRight = elementLeft + width;
+      const elementBottom = elementTop + height;
       
       // An element is selected if it's at least partially inside the selection box
       // This uses a proper intersection test between the selection rectangle and the element rectangle
       const intersects = (
-        element.position.x < right &&
+        elementLeft < right &&
         elementRight > left &&
-        element.position.y < bottom &&
+        elementTop < bottom &&
         elementBottom > top
       );
       
@@ -89,8 +98,7 @@ export const useElementSelection = () => {
     console.log("Setting selection to:", newSelection);
     setSelectedElementIds(newSelection);
     
-    // Apply the multi-selection to the diagram engine
-    diagramEngine.selectMultipleElements(newSelection);
+    // Return the ids to be handled by the caller
     return newSelection;
   }, [getElements, selectedElementIds]);
   

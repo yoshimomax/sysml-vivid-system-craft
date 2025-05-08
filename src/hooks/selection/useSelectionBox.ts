@@ -1,5 +1,5 @@
 
-import { useState, useCallback, RefObject } from "react";
+import { useState, useCallback, RefObject, useRef } from "react";
 import { Position } from "../../model/types";
 import { useModelingStore } from "../../store";
 
@@ -29,8 +29,8 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!rect) return;
     
     // Calculate start position in canvas coordinates
-    const startX = (e.clientX - rect.left) + (canvasRef.current?.scrollLeft || 0);
-    const startY = (e.clientY - rect.top) + (canvasRef.current?.scrollTop || 0);
+    const startX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
+    const startY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
     
     console.log("Selection starting at:", { startX, startY, scale });
     
@@ -48,18 +48,18 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!isSelecting || !selectionBox || !canvasRef.current) return;
     
     const rect = canvasRef.current.getBoundingClientRect();
-    // Calculate end position in canvas coordinates
-    const endX = (e.clientX - rect.left) + (canvasRef.current?.scrollLeft || 0);
-    const endY = (e.clientY - rect.top) + (canvasRef.current?.scrollTop || 0);
+    // Calculate end position in canvas coordinates, adjusted for scale
+    const endX = (e.clientX - rect.left) / scale + (canvasRef.current?.scrollLeft || 0);
+    const endY = (e.clientY - rect.top) / scale + (canvasRef.current?.scrollTop || 0);
     
-    console.log("Selection updating to:", { endX, endY });
+    console.log("Selection updating to:", { endX, endY, scale });
     
     setSelectionBox({
       ...selectionBox,
       endX,
       endY
     });
-  }, [isSelecting, selectionBox, canvasRef]);
+  }, [isSelecting, selectionBox, canvasRef, scale]);
   
   // Reset selection box
   const resetSelection = useCallback(() => {
@@ -71,15 +71,15 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
   const getNormalizedSelectionBox = useCallback(() => {
     if (!selectionBox) return null;
     
-    // Convert from screen coordinates to canvas coordinates by dividing by scale
-    // These are now in the coordinate system of the diagram elements
-    const left = Math.min(selectionBox.startX, selectionBox.endX) / scale;
-    const top = Math.min(selectionBox.startY, selectionBox.endY) / scale;
-    const right = Math.max(selectionBox.startX, selectionBox.endX) / scale;
-    const bottom = Math.max(selectionBox.startY, selectionBox.endY) / scale;
+    // Convert coordinates to the element coordinate system
+    // These values are now in the same coordinate system as the diagram elements
+    const left = Math.min(selectionBox.startX, selectionBox.endX);
+    const top = Math.min(selectionBox.startY, selectionBox.endY);
+    const right = Math.max(selectionBox.startX, selectionBox.endX);
+    const bottom = Math.max(selectionBox.startY, selectionBox.endY);
     
     // Ensure the selection box has minimum dimensions to avoid pixel-perfect selection issues
-    const minSize = 2 / scale;  // Minimum size of 2 pixels
+    const minSize = 2;  // Minimum size of 2 pixels
     const width = right - left;
     const height = bottom - top;
     

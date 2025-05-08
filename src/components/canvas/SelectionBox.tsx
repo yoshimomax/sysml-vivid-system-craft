@@ -15,11 +15,11 @@ interface SelectionBoxProps {
 export const SelectionBox: React.FC<SelectionBoxProps> = ({ isSelecting, selectionBox, scale }) => {
   if (!isSelecting || !selectionBox) return null;
 
-  // Calculate dimensions in screen coordinates
-  const left = Math.min(selectionBox.startX, selectionBox.endX);
-  const top = Math.min(selectionBox.startY, selectionBox.endY);
-  const width = Math.abs(selectionBox.endX - selectionBox.startX);
-  const height = Math.abs(selectionBox.endY - selectionBox.startY);
+  // Calculate dimensions in screen coordinates (need to multiply by scale for display)
+  const left = Math.min(selectionBox.startX, selectionBox.endX) * scale;
+  const top = Math.min(selectionBox.startY, selectionBox.endY) * scale;
+  const width = Math.abs(selectionBox.endX - selectionBox.startX) * scale;
+  const height = Math.abs(selectionBox.endY - selectionBox.startY) * scale;
 
   // Only render if the selection has some size
   if (width < 2 && height < 2) return null;
