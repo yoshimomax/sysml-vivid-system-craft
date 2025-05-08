@@ -8,8 +8,12 @@ import { diagramEngine } from "../core/diagram";
 export const useCanvasEvents = (
   isSelecting: boolean,
   isDragging: boolean,
+  isResizing: boolean,
   isCreatingRelationship: boolean,
-  cancelRelationshipCreation: () => void
+  cancelRelationshipCreation: () => void,
+  contextMenuPosition: any | null,
+  setContextMenuPosition: (position: any | null) => void,
+  setElementForContextMenu: (elementId: string | null) => void
 ) => {
   // Handle canvas click
   const handleCanvasClick = useCallback((e: React.MouseEvent, canvasRef: React.RefObject<HTMLDivElement>) => {
@@ -25,6 +29,12 @@ export const useCanvasEvents = (
     if (isSelecting || isDragging) {
       console.log("Skipping deselection during selection/drag");
       return;
+    }
+    
+    // Close any open context menus
+    if (contextMenuPosition) {
+      setContextMenuPosition(null);
+      setElementForContextMenu(null);
     }
     
     if (isCanvas) {
@@ -44,7 +54,7 @@ export const useCanvasEvents = (
         diagramEngine.selectMultipleElements([]);
       }
     }
-  }, [isCreatingRelationship, cancelRelationshipCreation, isSelecting, isDragging]);
+  }, [isCreatingRelationship, cancelRelationshipCreation, isSelecting, isDragging, contextMenuPosition, setContextMenuPosition, setElementForContextMenu]);
   
   // Handle relationship click
   const handleRelationshipClick = useCallback((e: React.MouseEvent, relationshipId: string) => {

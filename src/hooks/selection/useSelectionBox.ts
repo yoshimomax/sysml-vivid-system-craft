@@ -72,12 +72,13 @@ export const useSelectionBox = (canvasRef: RefObject<HTMLDivElement>) => {
     if (!selectionBox) return null;
     
     // Convert from screen coordinates to canvas coordinates by dividing by scale
+    // These are now in the coordinate system of the diagram elements
     const left = Math.min(selectionBox.startX, selectionBox.endX) / scale;
     const top = Math.min(selectionBox.startY, selectionBox.endY) / scale;
     const right = Math.max(selectionBox.startX, selectionBox.endX) / scale;
     const bottom = Math.max(selectionBox.startY, selectionBox.endY) / scale;
     
-    console.log("Normalized selection box:", { left, top, right, bottom });
+    console.log("Normalized selection box:", { left, top, right, bottom, scale });
     
     return { left, top, right, bottom };
   }, [selectionBox, scale]);

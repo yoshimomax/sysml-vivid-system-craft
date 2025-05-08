@@ -23,26 +23,28 @@ export const ContextMenuManager: React.FC<ContextMenuManagerProps> = ({
     e.stopPropagation();
   };
   
-  // 画面上の位置を調整（画面外にはみ出さないよう）
+  // Position menu exactly at cursor position without adjustment
   const adjustPosition = (pos: Position): Position => {
     // メニューのサイズを推定（実際のサイズは動的に変わるため推定値）
     const estimatedWidth = 200;
-    const estimatedHeight = 300;
+    const estimatedHeight = 150;
     
     // 画面のサイズを取得
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    // 右端または下端に近い場合は位置を調整
+    // 画面の端に近い場合は位置を調整
     let adjustedX = pos.x;
     let adjustedY = pos.y;
     
+    // Right edge adjustment
     if (pos.x + estimatedWidth > viewportWidth) {
-      adjustedX = viewportWidth - estimatedWidth;
+      adjustedX = pos.x - estimatedWidth;
     }
     
+    // Bottom edge adjustment
     if (pos.y + estimatedHeight > viewportHeight) {
-      adjustedY = viewportHeight - estimatedHeight;
+      adjustedY = pos.y - estimatedHeight;
     }
     
     return { x: adjustedX, y: adjustedY };

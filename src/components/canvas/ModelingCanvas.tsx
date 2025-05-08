@@ -81,16 +81,29 @@ export const ModelingCanvas: React.FC = () => {
     updateStoreSelection();
   }, [updateStoreSelection]);
   
+  // Event handlers with correct signatures for TypeScript
+  const handleClickWrapper: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    handleCanvasClick(e);
+  };
+  
+  const handleMouseMoveWrapper: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    handleMouseMove(e, canvasRef);
+  };
+  
+  const handleElementMouseDownWrapper = (e: React.MouseEvent, elementId: string) => {
+    handleElementMouseDown(e, elementId, canvasRef);
+  };
+  
   return (
     <div className="flex h-full">
       <div
         ref={canvasRef}
         className="canvas-wrapper flex-1 overflow-auto relative"
         onMouseDown={handleCanvasMouseDown}
-        onMouseMove={(e) => handleMouseMove(e, canvasRef)}
+        onMouseMove={handleMouseMoveWrapper}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
-        onClick={(e) => handleCanvasClick(e)}
+        onClick={handleClickWrapper}
         onContextMenu={handleCanvasContextMenu}
         onWheel={handleWheel}
       >
@@ -132,7 +145,7 @@ export const ModelingCanvas: React.FC = () => {
               tempEndPoint,
               type: relationshipType
             }}
-            onElementMouseDown={(e, elementId) => handleElementMouseDown(e, elementId, canvasRef)}
+            onElementMouseDown={handleElementMouseDownWrapper}
             onElementContextMenu={handleElementContextMenu}
             onRelationshipClick={handleRelationshipClick}
           />

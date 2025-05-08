@@ -2,6 +2,7 @@
 import { useCallback, RefObject } from "react";
 import { useSelectionBox } from "./selection/useSelectionBox";
 import { useElementSelection } from "./selection/useElementSelection";
+import { diagramEngine } from "../core/diagram";
 
 /**
  * Main hook for multi-selection functionality
@@ -41,9 +42,10 @@ export const useMultiSelect = (canvasRef: RefObject<HTMLDivElement>) => {
     const selectedIds = findElementsInSelection(normalizedBox, shiftKey);
     console.log("Selected element IDs:", selectedIds);
     
-    // 重要：ここで選択を確定させる
+    // Apply selection to store immediately
     if (selectedIds && selectedIds.length > 0) {
       console.log("Confirmed multi-selection with IDs:", selectedIds);
+      diagramEngine.selectMultipleElements(selectedIds);
     }
     
     resetSelection();
