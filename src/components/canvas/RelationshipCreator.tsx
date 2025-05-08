@@ -19,7 +19,8 @@ interface RelationshipCreatorProps {
 export const RelationshipCreator: React.FC<RelationshipCreatorProps> = ({
   visible,
   position,
-  onSelectType
+  onSelectType,
+  onCancel
 }) => {
   if (!visible || !position) return null;
 
@@ -57,29 +58,21 @@ export const RelationshipCreator: React.FC<RelationshipCreatorProps> = ({
   };
 
   return (
-    <div 
-      className="absolute relationship-context-menu"
-      style={{ 
-        left: position.x, 
-        top: position.y
-      }}
-    >
-      <div className="bg-card border rounded shadow-lg p-1 z-50">
-        <div className="text-sm font-medium px-2 py-1 border-b mb-1">
-          Create Relationship
-        </div>
-        <div className="max-h-64 overflow-y-auto">
-          {relationshipTypes.map(type => (
-            <Button
-              key={type}
-              variant="ghost"
-              className="w-full justify-start text-left text-sm py-1"
-              onClick={() => onSelectType(type)}
-            >
-              {getRelationshipName(type)}
-            </Button>
-          ))}
-        </div>
+    <div className="bg-card border rounded shadow-lg p-1 z-50">
+      <div className="text-sm font-medium px-2 py-1 border-b mb-1">
+        Create Relationship
+      </div>
+      <div className="max-h-64 overflow-y-auto">
+        {relationshipTypes.map(type => (
+          <Button
+            key={type}
+            variant="ghost"
+            className="w-full justify-start text-left text-sm py-1"
+            onClick={() => onSelectType(type)}
+          >
+            {getRelationshipName(type)}
+          </Button>
+        ))}
       </div>
     </div>
   );

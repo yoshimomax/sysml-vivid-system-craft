@@ -13,7 +13,7 @@ export const useContextMenu = () => {
   const handleCanvasContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     
-    // カーソル位置に合わせる
+    // Store exact cursor position
     setContextMenuPosition({ x: e.clientX, y: e.clientY });
     setElementForContextMenu(null);
   }, []);
@@ -23,7 +23,7 @@ export const useContextMenu = () => {
     e.preventDefault();
     e.stopPropagation();
     
-    // カーソル位置に合わせる
+    // Store exact cursor position
     setContextMenuPosition({ x: e.clientX, y: e.clientY });
     setElementForContextMenu(elementId);
   }, []);
